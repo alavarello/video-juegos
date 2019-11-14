@@ -92,6 +92,7 @@ public class Client
         {
             SendMove();
             SendRotation();
+            SendShot();
         }
     }
 

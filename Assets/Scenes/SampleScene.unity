@@ -934,7 +934,7 @@ GameObject:
   - component: {fileID: 1573026401}
   m_Layer: 5
   m_Name: DamageImage
-  m_TagString: Untagged
+  m_TagString: DamageImage
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1007,7 +1007,7 @@ GameObject:
   - component: {fileID: 1578715515}
   m_Layer: 5
   m_Name: HealthSlider
-  m_TagString: Untagged
+  m_TagString: Health
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1108,12 +1108,11 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1661079767}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 76a99222b1e4a384e923ac7e86efc709, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerHealth: {fileID: 0}
   enemy: {fileID: 8295378878263963758, guid: 18d368fa54726bd4e96d9a44c0e8d9fe, type: 3}
   spawnTime: 3
   spawnPoints:
@@ -1144,7 +1143,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76a99222b1e4a384e923ac7e86efc709, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerHealth: {fileID: 0}
   enemy: {fileID: 153412, guid: 548c56f4bcf4db24b8aa057e9846a005, type: 3}
   spawnTime: 3
   spawnPoints:
@@ -1161,7 +1159,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76a99222b1e4a384e923ac7e86efc709, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerHealth: {fileID: 0}
   enemy: {fileID: 100000, guid: ea3c2728ef33e3a4d99527a86cda6465, type: 3}
   spawnTime: 3
   spawnPoints:
@@ -1733,9 +1730,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5dc206782f074d8daa4ff555bbcab9d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damagePerShot: 20
-  timeBetweenBullets: 0.15
   range: 100
+  timeBetweenBullets: 0.15
+  isShooting: 0
 --- !u!1001 &2365514817777623569
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1747,6 +1744,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: ClientPlayer
+      objectReference: {fileID: 0}
+    - target: {fileID: 8536794807524291413, guid: 963c276cf8af8ce4aafe10ce3fb511e8,
+        type: 3}
+      propertyPath: m_TagString
+      value: Untagged
       objectReference: {fileID: 0}
     - target: {fileID: 3801355044244089331, guid: 963c276cf8af8ce4aafe10ce3fb511e8,
         type: 3}

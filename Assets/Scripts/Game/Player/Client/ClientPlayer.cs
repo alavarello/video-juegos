@@ -11,7 +11,6 @@ public class ClientPlayer: MonoBehaviour
      public int startingHealth = 100;
      public int currentHealth;
      public AudioClip deathClip;
-     public Image damageImage;
 
      // PlayerMovement
      public float speed = 6f;            // The speed that the player will move at.
@@ -22,6 +21,7 @@ public class ClientPlayer: MonoBehaviour
      private Animator _anim;
      private AudioSource _hurtAudio;
      private Rigidbody _playerRigidBody;
+     private PlayerShootingClient _playerShootingClient;
 
      bool isDead;
      bool damaged;
@@ -58,6 +58,7 @@ public class ClientPlayer: MonoBehaviour
         _anim = GetComponent <Animator> ();
         _hurtAudio = GetComponent <AudioSource> ();
         _playerRigidBody = GetComponent<Rigidbody>();
+        _playerShootingClient = GetComponentInChildren<PlayerShootingClient>();
         // -----------        -----------
         
         // ----------- Health -----------
@@ -90,7 +91,7 @@ public class ClientPlayer: MonoBehaviour
             if(currentHealth <= 0 && !isDead)
             {
                 isDead = true;
-
+                _playerShootingClient.isDead = true;
                 _anim.SetTrigger ("Die");
 
                 _hurtAudio.clip = deathClip;
@@ -123,6 +124,11 @@ public class ClientPlayer: MonoBehaviour
     private void FixedUpdate()
     {
         UpdateMovement();
+        if (state.isShooting)
+        {
+            _playerShootingClient.isShooting = true;
+        }
+
     }
 
     // Update is called once per frame

@@ -84,7 +84,8 @@ public class Server
                 } else if (message.messageType == MessageType.Fire)
                 {
                     var id = BitConverter.ToInt32(message.message, 0);
-                   _players[id].Shoot();
+                   _players[id].playerShooting.Shoot();
+                   _players[id].isShooting = true;
                 }
                 
             }

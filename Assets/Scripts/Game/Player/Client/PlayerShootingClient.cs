@@ -1,29 +1,47 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public class PlayerShootingClient : MonoBehaviour
 {
 
     public float range = 100f;
-    
+    private float timer = 0;                                    // A timer to determine when to fire.
+    public float timeBetweenBullets = 0.15f;        // The time between each shot.
+
     Ray shootRay = new Ray();
     RaycastHit shootHit;
-    int shootableMask;
     ParticleSystem gunParticles;
     LineRenderer gunLine;
     AudioSource gunAudio;
     Light gunLight;
     float effectsDisplayTime = 0.2f;
-
-
+    public bool isShooting;
+    public bool isDead = false;
     void Awake ()
     {
-        shootableMask = LayerMask.GetMask ("Shootable");
         gunParticles = GetComponent<ParticleSystem> ();
         gunLine = GetComponent <LineRenderer> ();
         gunAudio = GetComponent<AudioSource> ();
         gunLight = GetComponent<Light> ();
     }
-    
+
+    private void Update()
+    {
+        timer += Time.deltaTime;
+
+        if (isShooting && !isDead)
+        {
+            Shoot();
+            isShooting = false;
+            timer = 0;
+        } 
+        if(timer >= timeBetweenBullets * effectsDisplayTime)
+        {
+            isShooting = false;
+            DisableEffects();
+        }
+    }
+
 
     public void DisableEffects ()
     {
@@ -31,7 +49,7 @@ public class PlayerShootingClient : MonoBehaviour
         gunLight.enabled = false;
     }
 
-    void Shoot ()
+    public void Shoot ()
     {
 
         gunAudio.Play ();

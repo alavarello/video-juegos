@@ -4,6 +4,8 @@ public class Snapshot
 {
     public List<PlayerState> players = new List<PlayerState>();
 
+    public int score;
+    
     public int sequence;
 
     public float timestamp;

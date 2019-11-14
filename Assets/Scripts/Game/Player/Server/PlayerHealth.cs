@@ -1,6 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
-using System.Collections;
 using UnityEngine.SceneManagement;
 
 
@@ -8,12 +6,7 @@ public class PlayerHealth : MonoBehaviour
 {
     public int startingHealth = 100;
     public int currentHealth;
-    public Slider healthSlider;
-    public Image damageImage;
-    public AudioClip deathClip;
-    public float flashSpeed = 5f;
-    public Color flashColour = new Color(1f, 0f, 0f, 0.1f);
-    
+
     PlayerMovement playerMovement;
     bool isDead;
     bool damaged;
@@ -31,9 +24,6 @@ public class PlayerHealth : MonoBehaviour
 
         currentHealth -= amount;
 
-        healthSlider.value = currentHealth;
-
-
         if(currentHealth <= 0 && !isDead)
         {
             Death ();
@@ -44,7 +34,6 @@ public class PlayerHealth : MonoBehaviour
     void Death ()
     {
         isDead = true;
-
 
         playerMovement.enabled = false;
     }

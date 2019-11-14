@@ -142,7 +142,7 @@ public class Interpolation
                 vector.x, vector.y, vector.z, 
                 rotation.x, rotation.y, rotation.z, 
                 from[i].health,
-                false
+                from[i].isShooting
                 );
             cubeState.Id = from[i].Id;
             interpolatedSnapshot.players.Add(cubeState);
