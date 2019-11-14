@@ -753,8 +753,8 @@ MonoBehaviour:
   isServer: 1
   isClient: 1
   playerId: 0
-  serverSps: 30
-  clientFps: 60
+  serverSps: 20
+  clientFps: 50
 --- !u!4 &1058797112
 Transform:
   m_ObjectHideFlags: 0
@@ -1733,6 +1733,7 @@ MonoBehaviour:
   range: 100
   timeBetweenBullets: 0.15
   isShooting: 0
+  isDead: 0
 --- !u!1001 &2365514817777623569
 PrefabInstance:
   m_ObjectHideFlags: 0

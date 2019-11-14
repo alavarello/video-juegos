@@ -103,7 +103,7 @@ public class Server
             _packetProcessor.SendUnreliableData(
                 ms.ToArray(), ipEndPoint, MessageType.Input, _sequence);
         }
-
+        Debug.Log(_sequence/_engine.serverSps);
         _sequence++;
     }
 }

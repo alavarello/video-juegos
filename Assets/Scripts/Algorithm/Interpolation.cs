@@ -123,7 +123,7 @@ public class Interpolation
 
         toTime = GetSnapshotTime(toSnapshot.sequence);
         fromTime = GetSnapshotTime(fromSnapshot.sequence);
-
+        Debug.Log(fromTime);
         var from = fromSnapshot.players;
         var to = toSnapshot.players;
         var amountOfPlayers = Math.Min(from.Count, to.Count);
@@ -150,20 +150,7 @@ public class Interpolation
         
         return interpolatedSnapshot;
         
-//        
-//        var clientTime = clientSequence / (float) engine.clientFps;
-//        if (fromSnapshot == null)
-//        {
-//            fromSnapshot = _snapshots.Dequeue();
-//        }
-//        if (toTime < clientTime)
-//        {
-//            fromSnapshot = _snapshots.Dequeue();
-//
-//        }
-//        toSnapshot = _snapshots.Peek();
-//        toTime = toSnapshot.sequence / (float) engine.serverSps;
-        
-       
+//       
+
     }
 }
