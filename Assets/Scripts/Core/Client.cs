@@ -6,6 +6,7 @@ using System.Net;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Xml.Linq;
 using UnityEngine;
+using UnityEngine.SocialPlatforms.Impl;
 using UnityEngine.UI;
 
 public class Client
@@ -173,7 +174,10 @@ public class Client
         {
             var ms = new MemoryStream();
             var bf = new BinaryFormatter();
-            ms.Write(message.message, 0, message.message.Length);
+            var score = BitConverter.ToInt32(message.message, 0);
+            if(score > ScoreManager.score)
+                ScoreManager.score = score;
+            ms.Write(message.message, sizeof(Int32), message.message.Length-sizeof(Int32));
             ms.Seek(0, SeekOrigin.Begin);
             List<PlayerState> playerStates = (List<PlayerState>)bf.Deserialize(ms);
         
@@ -187,12 +191,11 @@ public class Client
     {
 
         var interpolatedSnapshot = _interpolation.Interpolate(sequence);
-
         if (interpolatedSnapshot == null)
         {
             return false;
         }
-        
+
         foreach (var playerState in interpolatedSnapshot.players)
         {
             if(!players.ContainsKey(playerState.Id))

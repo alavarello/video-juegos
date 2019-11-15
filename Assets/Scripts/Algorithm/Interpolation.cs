@@ -147,6 +147,8 @@ public class Interpolation
             cubeState.Id = from[i].Id;
             interpolatedSnapshot.players.Add(cubeState);
         }
+
+        interpolatedSnapshot.score = fromSnapshot.score;
         
         return interpolatedSnapshot;
         

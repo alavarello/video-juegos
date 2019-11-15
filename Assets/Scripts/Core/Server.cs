@@ -22,6 +22,9 @@ public class Server
 
     private int _updateCounter = 0;
     
+    public static int score = 0;
+
+    
     // Start is called before the first frame update
     public Server(Engine engine, IEnumerable<Player> players)
     {
@@ -101,7 +104,7 @@ public class Server
         foreach (var ipEndPoint in ipEndPoints)
         {
             _packetProcessor.SendUnreliableData(
-                ms.ToArray(), ipEndPoint, MessageType.Input, _sequence);
+                BitConverter.GetBytes(score).Concat(ms.ToArray()).ToArray(), ipEndPoint, MessageType.Input, _sequence);
         }
         Debug.Log(_sequence/_engine.serverSps);
         _sequence++;
