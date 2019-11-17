@@ -8,6 +8,8 @@ public class PlayerShooting : MonoBehaviour
     Ray shootRay;                                   // A ray from the gun end forwards.
     RaycastHit shootHit;                            // A raycast hit to get information about what was hit.
     int shootableMask;                              // A layer mask so the raycast only hits things on the shootable layer.
+    
+    private bool _isDead = false;
 
     void Awake ()
     {
@@ -18,6 +20,7 @@ public class PlayerShooting : MonoBehaviour
 
     public void Shoot()
     {
+        if(_isDead) return;
 
         // Set the shootRay so that it starts at the end of the gun and points forward from the barrel.
         shootRay.origin = transform.position;
@@ -36,5 +39,10 @@ public class PlayerShooting : MonoBehaviour
                 enemyHealth.TakeDamage(damagePerShot, shootHit.point);
             }
         }
+    }
+    
+    public void Dead()
+    {
+        _isDead = true;
     }
 }

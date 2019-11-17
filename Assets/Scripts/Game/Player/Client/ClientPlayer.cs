@@ -4,8 +4,10 @@ using UnityEngine.UI;
 
 public class ClientPlayer: MonoBehaviour
 {
+    public static int playerId;
+    
     // Scripts 
-     private PlayerState state;
+     public PlayerState state;
      
      // PlayerHealth
      public int startingHealth = 100;
@@ -16,38 +18,18 @@ public class ClientPlayer: MonoBehaviour
      public float speed = 6f;            // The speed that the player will move at.
      private Vector3 _movement;                   // The vector to store the direction of the player's movement.
 
-     private float prevX, prevZ;
+     private float _prevX, _prevZ;
      // Objects
      private Animator _anim;
      private AudioSource _hurtAudio;
      private Rigidbody _playerRigidBody;
      private PlayerShootingClient _playerShootingClient;
 
-     bool isDead;
-     bool damaged;
-     
+     public bool isDead;
+     private bool _damaged;
 
-    public PlayerState getPlayerState()
-    {
-        return state;
-    }
 
-    public byte[] Serialize()
-    {
-        return state.Serialize();
-    }
-
-    public void UpdateState(byte[] bytes)
-    {
-        state = state.deserialize(bytes);
-    }
-
-    public void SetId(int id)
-    {
-        state.Id = id;
-    }
-    
-    public void SetPlayerState(PlayerState playerState)
+     public void SetPlayerState(PlayerState playerState)
     {
         state = playerState;
     }
@@ -75,47 +57,44 @@ public class ClientPlayer: MonoBehaviour
             rotation.x, rotation.y, rotation.z, 
             startingHealth, false
             );
-        prevX = position.x;
-        prevZ = position.z;
+        _prevX = position.x;
+        _prevZ = position.z;
         // -----------        -----------
     }
 
-    private void UpdateHealth()
+    public void UpdateHealth()
     {
-        if(state.health != currentHealth)
-        {
-            currentHealth = state.health;
+        if (state.health == currentHealth) return;
+        
+        currentHealth = state.health;
 
-            _hurtAudio.Play ();
+        _hurtAudio.Play ();
 
-            if(currentHealth <= 0 && !isDead)
-            {
-                isDead = true;
-                _playerShootingClient.isDead = true;
-                _anim.SetTrigger ("Die");
+        if (currentHealth > 0 || isDead) return;
+        
+        isDead = true;
+        _playerShootingClient.isDead = true;
+        _anim.SetTrigger ("Die");
 
-                _hurtAudio.clip = deathClip;
-                _hurtAudio.Play ();
-
-            }
-        }
+        _hurtAudio.clip = deathClip;
+        _hurtAudio.Play ();
     }
 
-    void UpdateMovement ()
+    private void UpdateMovement ()
     {
-        transform.position = new Vector3(state.x+2, state.y, state.z+2);
+        transform.position = new Vector3(state.x, state.y, state.z);
         // Set the player's rotation to this new rotation.
         _playerRigidBody.MoveRotation (Quaternion.Euler(state.xA, state.yA, state.zA));
         // Animate the player.
         Animating ();
 
-        prevX = state.x;
-        prevZ = state.z;
+        _prevX = state.x;
+        _prevZ = state.z;
     }
 
-    void Animating ()
+    private void Animating ()
     {
-        bool walking = prevX - state.x < 0.05 || prevZ - state.z < 0.05;
+        var walking = _prevX - state.x < 0.05 || _prevZ - state.z < 0.05;
 
         // Tell the animator whether or not the player is walking.
         _anim.SetBool ("IsWalking", walking);
@@ -123,6 +102,8 @@ public class ClientPlayer: MonoBehaviour
 
     private void FixedUpdate()
     {
+        // Do not Update the Main Player do to prediction
+        if (state.Id == playerId) return;
         UpdateMovement();
         if (state.isShooting)
         {
@@ -134,6 +115,35 @@ public class ClientPlayer: MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
-     UpdateHealth();
+        // Do not Update the Main Player do to prediction
+        if (state.Id == playerId) return;
+        UpdateHealth();
+    }
+    
+    
+    // --------------- Prediction Methods ----------------------
+    // These are exactly as the functions in PLayerMovement but in the client
+    public void Move(float h, float v)
+    {
+        // Set the movement vector based on the axis input.
+        _movement.Set(h, 0f, v);
+
+        // Normalise the movement vector and make it proportional to the speed per second.
+        _movement = _movement.normalized * (speed * Time.deltaTime * 3);
+
+        // Move the player to it's current position plus the movement.
+        _playerRigidBody.MovePosition(transform.position + _movement);
+
+    }
+    
+    public void Rotation(float xA, float yA, float zA)
+    {
+        transform.rotation = Quaternion.Euler(xA, yA, zA);
+    }
+
+    public void Shoot()
+    {
+        _playerShootingClient.isShooting = true;
+
     }
 }

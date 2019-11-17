@@ -10,15 +10,15 @@ public class Player : MonoBehaviour
     public PlayerShooting playerShooting;
     public bool isShooting;
 
-    float timer;
-    Ray shootRay = new Ray();
-    RaycastHit shootHit;
-    int shootableMask;
-    ParticleSystem gunParticles;
-    LineRenderer gunLine;
-    AudioSource gunAudio;
-    Light gunLight;
-    float effectsDisplayTime = 0.2f;
+    private float _timer;
+    private RaycastHit _shootHit;
+    private int _shootabeMask;
+    private ParticleSystem _gunParticles;
+    private LineRenderer _gunLine;
+    private AudioSource _gunAudio;
+    private Light _gunLight;
+
+    public int lastInputSequence;
 
     private void Awake()
     {

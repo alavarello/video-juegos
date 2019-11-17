@@ -7,24 +7,26 @@ public class PlayerHealth : MonoBehaviour
     public int startingHealth = 100;
     public int currentHealth;
 
-    PlayerMovement playerMovement;
-    bool isDead;
-    bool damaged;
+    private PlayerMovement _playerMovement;
+    private PlayerShooting _playerShooting;
+    private bool _isDead;
+    private bool _damaged;
 
 
     void Awake ()
     {
-        playerMovement = GetComponent <PlayerMovement> ();
+        _playerMovement = GetComponent <PlayerMovement> ();
+        _playerShooting = GetComponentInChildren<PlayerShooting>();
         currentHealth = startingHealth;
     }
 
     public void TakeDamage (int amount)
     {
-        damaged = true;
+        _damaged = true;
 
         currentHealth -= amount;
 
-        if(currentHealth <= 0 && !isDead)
+        if(currentHealth <= 0 && !_isDead)
         {
             Death ();
         }
@@ -33,14 +35,9 @@ public class PlayerHealth : MonoBehaviour
 
     void Death ()
     {
-        isDead = true;
+        _isDead = true;
 
-        playerMovement.enabled = false;
-    }
-
-
-    public void RestartLevel ()
-    {
-        SceneManager.LoadScene (0);
+        _playerMovement.Dead();
+        _playerShooting.Dead();
     }
 }

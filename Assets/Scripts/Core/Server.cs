@@ -8,30 +8,28 @@ using UnityEngine;
 
 public class Server
 {
-    private List<IPEndPoint> ipEndPoints = new List<IPEndPoint>();
+    private readonly List<IPEndPoint> _ipEndPoints = new List<IPEndPoint>();
 
-    private PacketProcessor _packetProcessor;
+    private readonly PacketProcessor _packetProcessor;
 
-    private Dictionary<int, Player> _players;
+    private readonly Dictionary<int, Player> _players;
     
-    private Engine _engine;
+    private readonly Engine _engine;
 
     private int _sequence = 0;
-
-    private int _lastSnapshot = 0;
-
+    
     private int _updateCounter = 0;
     
     public static int score = 0;
 
     
     // Start is called before the first frame update
-    public Server(Engine engine, IEnumerable<Player> players)
+    public Server(Engine engine)
     {
         _engine = engine;
         foreach (var ip in engine.IPs)
         {
-            ipEndPoints.Add(new IPEndPoint(IPAddress.Parse(ip), engine.clientListeningPort));
+            _ipEndPoints.Add(new IPEndPoint(IPAddress.Parse(ip), engine.clientListeningPort));
         }
         
         _packetProcessor = new PacketProcessor(null, engine.serverListeningPort, true);
@@ -42,7 +40,7 @@ public class Server
         foreach (var ips in engine.IPs)
         {
             var id = idCounter++;
-            var playerScript = createPlayer();
+            var playerScript = CreatePlayer();
             playerScript.id = id;
             playerScript.playerHealth = playerScript.GetComponent<PlayerHealth>();
             playerScript.playerMovement = playerScript.GetComponent<PlayerMovement>();
@@ -51,7 +49,7 @@ public class Server
         
     }
 
-    public Player createPlayer()
+    private static Player CreatePlayer()
     {
         var playerPrefab = Resources.Load<GameObject>("Prefabs/Server/Player");
         var player = GameObject.Instantiate<GameObject>(playerPrefab);  
@@ -64,49 +62,51 @@ public class Server
     {
         _updateCounter++;
         if (_updateCounter % (60/_engine.serverSps) != 0) return;
-        List<Message> data;
-       
-        data = _packetProcessor.GetData();
+
+        var data = _packetProcessor.GetData();
          while (data != null)
-        {
+         {
             foreach (var message in data)
             {
+                var id = BitConverter.ToInt32(message.message, 0);
                 if (message.messageType == MessageType.Input)
                 {
-                    var id = BitConverter.ToInt32(message.message, 0);
+                    
                     var h = BitConverter.ToInt32(message.message, sizeof(Int32));
                     var v = BitConverter.ToInt32(message.message, sizeof(Int32)*2);
                     _players[id].playerMovement.Move(h, v);
                 } else if (message.messageType == MessageType.Rotation)
                 {
-                    var id = BitConverter.ToInt32(message.message, 0);
                     var x = BitConverter.ToInt32(message.message, sizeof(Int32));
                     var y = BitConverter.ToInt32(message.message, sizeof(Int32)*2);
                     var z = BitConverter.ToInt32(message.message, sizeof(Int32)*3);
                     _players[id].playerMovement.Rotation(x, y, z);
                 } else if (message.messageType == MessageType.Fire)
                 {
-                    var id = BitConverter.ToInt32(message.message, 0);
                    _players[id].playerShooting.Shoot();
                    _players[id].isShooting = true;
                 }
-                
+
+                if (_players[id].lastInputSequence < message.sequence)
+                {
+                    _players[id].lastInputSequence = message.sequence;
+                }
+
             }
             data = _packetProcessor.GetData();
-        }
+         }
 
-        var cubeStates = _players.Values.Select(player => player.GetPlayerState()).ToList();
+        var playerStates = _players.Values.Select(player => player.GetPlayerState()).ToList();
 
         var bf = new BinaryFormatter();
         var ms = new MemoryStream();
-        bf.Serialize(ms, cubeStates);
+        bf.Serialize(ms, playerStates);
 
-        foreach (var ipEndPoint in ipEndPoints)
+        foreach (var ipEndPoint in _ipEndPoints)
         {
             _packetProcessor.SendUnreliableData(
                 BitConverter.GetBytes(score).Concat(ms.ToArray()).ToArray(), ipEndPoint, MessageType.Input, _sequence);
         }
-        Debug.Log(_sequence/_engine.serverSps);
         _sequence++;
     }
 }

@@ -31,12 +31,13 @@ public class Engine: MonoBehaviour
     {
         if (isServer)
         {
-            server = new Server(this, FindObjectsOfType<Player>());
+            server = new Server(this);
         }
-        
+
         if(isClient)
         {
-            client = new Client(this, FindObjectOfType<ClientPlayer>());
+            ClientPlayer.playerId = playerId;
+                client = new Client(this, FindObjectOfType<ClientPlayer>());
         }
     }
 
