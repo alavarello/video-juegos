@@ -40,7 +40,9 @@ public class Engine: MonoBehaviour
         if(isClient)
         {
             ClientPlayer.playerId = playerId;
-                client = new Client(this, FindObjectOfType<ClientPlayer>());
+            client = new Client(this, FindObjectOfType<ClientPlayer>());
+            ClientPlayer.client = client;
+            GameOverManager.client = client;
         }
     }
 

@@ -5,6 +5,7 @@ using UnityEngine.UI;
 public class ClientPlayer : MonoBehaviour
 {
     public static int playerId;
+    public static Client client;
 
     // Scripts 
     public PlayerState state;
@@ -78,6 +79,12 @@ public class ClientPlayer : MonoBehaviour
 
         _hurtAudio.clip = deathClip;
         _hurtAudio.Play();
+
+        if (this == client.cameraPlayer)
+        {
+            client.ChangeCamera();
+        }
+        
     }
 
     private void UpdateMovement()

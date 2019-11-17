@@ -15,7 +15,7 @@ public class Client
 
     private readonly IPEndPoint _serverIpEndPoint;
 
-    private readonly Dictionary<int, ClientPlayer> _players;
+    public readonly Dictionary<int, ClientPlayer> players;
     
     private Snapshot _snapshot;
 
@@ -49,6 +49,8 @@ public class Client
     
     private float _timeForNextSnapshot = 0;
 
+    public ClientPlayer cameraPlayer;
+
     
     // Start is called before the first frame update
     public Client(Engine engine, ClientPlayer player)
@@ -56,13 +58,32 @@ public class Client
         _engine = engine;
         _serverIpEndPoint = new IPEndPoint(IPAddress.Parse(engine.serverIp), engine.serverListeningPort);
         _packetProcessor = new PacketProcessor(null, engine.clientListeningPort, true);
-        _players = new Dictionary<int, ClientPlayer>();
+        players = new Dictionary<int, ClientPlayer>();
         _interpolation = new Interpolation(engine);
         _prediction = new Prediction(player, _engine.playerId);
         _player = player;
         _floorMask = LayerMask.GetMask ("Floor");
         _healthSlider = GameObject.FindGameObjectsWithTag("Health")[0].GetComponent<Slider>();
         _damageImage = GameObject.FindGameObjectsWithTag("DamageImage")[0].GetComponent<Image>();
+    }
+
+    public void ChangeCamera()
+    {
+        var i = 0;
+        foreach (var player in players.Values)
+        {
+            if(!player.isDead)
+            {
+                var camera = GameObject.Find("Main Camera");
+                camera.GetComponent<CameraFollow>().target = player.transform;
+                cameraPlayer = player;
+            }
+            
+        }
+
+        
+        
+        
     }
 
     // Update is called once per frame
@@ -105,20 +126,20 @@ public class Client
         {
             SaveMessage(message);
         }
+        
 
     }
-
 
     private void SendRotation()
     {
         if (_playerRigidbody == null)
         {
-            if (!_players.ContainsKey(_engine.playerId))
+            if (!players.ContainsKey(_engine.playerId))
             {
                 return;
             }
 
-            _playerRigidbody = _players[_engine.playerId].GetComponent<Rigidbody>();
+            _playerRigidbody = players[_engine.playerId].GetComponent<Rigidbody>();
         }
         
         
@@ -152,7 +173,7 @@ public class Client
         _packetProcessor.SendReliableFastData(concatenation.ToArray(), _serverIpEndPoint, MessageType.Rotation, _sequence);
         
         // Prediction
-        _players[_engine.playerId].Rotation(angles.x, angles.y, angles.z);
+        players[_engine.playerId].Rotation(angles.x, angles.y, angles.z);
     }
     
     private void SendMove()
@@ -184,7 +205,7 @@ public class Client
         IEnumerable<byte> concatenation = BitConverter.GetBytes(_engine.playerId);
         _packetProcessor.SendReliableFastData(concatenation.ToArray(), _serverIpEndPoint, MessageType.Fire, _sequence);
         // Prediction
-        _players[_engine.playerId].Shoot();
+        players[_engine.playerId].Shoot();
 
     }
 
@@ -219,27 +240,28 @@ public class Client
 
         foreach (var playerState in interpolatedSnapshot.players)
         {
-            if(!_players.ContainsKey(playerState.Id))
+            if(!players.ContainsKey(playerState.Id))
             {
                 if (playerState.Id != _engine.playerId)
                 {
                     var playerPrefab = Resources.Load<GameObject>("Prefabs/Client/ClientPlayer");
                     var player = GameObject.Instantiate<GameObject>(playerPrefab);  
                     var playerScript = player.GetComponent<ClientPlayer>();
-                    _players.Add(playerState.Id, playerScript);
+                    players.Add(playerState.Id, playerScript);
                 }
                 else
                 {
-                    _players.Add(playerState.Id, _player);
+                    players.Add(playerState.Id, _player);
                     var camera = GameObject.Find("Main Camera");
                     camera.GetComponent<CameraFollow>().target = _player.transform;
+                    cameraPlayer = _player;
                 }
 
             }
 
             if (playerState.Id == _engine.playerId)
             {
-                if (_players[playerState.Id].currentHealth != playerState.health)
+                if (players[playerState.Id].currentHealth != playerState.health)
                 {
                     _healthSlider.value = playerState.health;
                     _damageImage.color = _flashColour;
@@ -250,7 +272,7 @@ public class Client
                 }   
             }
 
-            _players[playerState.Id].SetPlayerState(playerState); 
+            players[playerState.Id].SetPlayerState(playerState); 
         }
 
         return true;
