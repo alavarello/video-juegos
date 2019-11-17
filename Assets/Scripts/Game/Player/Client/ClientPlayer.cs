@@ -2,33 +2,34 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ClientPlayer: MonoBehaviour
+public class ClientPlayer : MonoBehaviour
 {
     public static int playerId;
-    
+
     // Scripts 
-     public PlayerState state;
-     
-     // PlayerHealth
-     public int startingHealth = 100;
-     public int currentHealth;
-     public AudioClip deathClip;
+    public PlayerState state;
 
-     // PlayerMovement
-     private Vector3 _movement;                   // The vector to store the direction of the player's movement.
+    // PlayerHealth
+    public int startingHealth = 100;
+    public int currentHealth;
+    public AudioClip deathClip;
 
-     private float _prevX, _prevZ;
-     // Objects
-     private Animator _anim;
-     private AudioSource _hurtAudio;
-     private Rigidbody _playerRigidBody;
-     private PlayerShootingClient _playerShootingClient;
+    // PlayerMovement
+    private Vector3 _movement; // The vector to store the direction of the player's movement.
 
-     public bool isDead;
-     private bool _damaged;
+    private float _prevX, _prevZ;
+
+    // Objects
+    private Animator _anim;
+    private AudioSource _hurtAudio;
+    private Rigidbody _playerRigidBody;
+    private PlayerShootingClient _playerShootingClient;
+
+    public bool isDead;
+    private bool _damaged;
 
 
-     public void SetPlayerState(PlayerState playerState)
+    public void SetPlayerState(PlayerState playerState)
     {
         state = playerState;
     }
@@ -36,12 +37,12 @@ public class ClientPlayer: MonoBehaviour
     private void Awake()
     {
         // ----------- Objects -----------
-        _anim = GetComponent <Animator> ();
-        _hurtAudio = GetComponent <AudioSource> ();
+        _anim = GetComponent<Animator>();
+        _hurtAudio = GetComponent<AudioSource>();
         _playerRigidBody = GetComponent<Rigidbody>();
         _playerShootingClient = GetComponentInChildren<PlayerShootingClient>();
         // -----------        -----------
-        
+
         // ----------- Health -----------
         currentHealth = startingHealth;
         // -----------        -----------
@@ -52,10 +53,10 @@ public class ClientPlayer: MonoBehaviour
         var rotation = localTransform.rotation;
         // Initialize the state
         state = new PlayerState(
-            position.x, position.y, position.z, 
-            rotation.x, rotation.y, rotation.z, 
+            position.x, position.y, position.z,
+            rotation.x, rotation.y, rotation.z,
             startingHealth, false
-            );
+        );
         _prevX = position.x;
         _prevZ = position.z;
         // -----------        -----------
@@ -64,39 +65,39 @@ public class ClientPlayer: MonoBehaviour
     public void UpdateHealth()
     {
         if (state.health == currentHealth) return;
-        
+
         currentHealth = state.health;
 
-        _hurtAudio.Play ();
+        _hurtAudio.Play();
 
         if (currentHealth > 0 || isDead) return;
-        
+
         isDead = true;
         _playerShootingClient.isDead = true;
-        _anim.SetTrigger ("Die");
+        _anim.SetTrigger("Die");
 
         _hurtAudio.clip = deathClip;
-        _hurtAudio.Play ();
+        _hurtAudio.Play();
     }
 
-    private void UpdateMovement ()
+    private void UpdateMovement()
     {
         transform.position = new Vector3(state.x, state.y, state.z);
         // Set the player's rotation to this new rotation.
-        _playerRigidBody.MoveRotation (Quaternion.Euler(state.xA, state.yA, state.zA));
+        _playerRigidBody.MoveRotation(Quaternion.Euler(state.xA, state.yA, state.zA));
         // Animate the player.
-        Animating ();
+        Animating();
 
         _prevX = state.x;
         _prevZ = state.z;
     }
 
-    private void Animating ()
+    private void Animating()
     {
         var walking = _prevX - state.x < 0.05 || _prevZ - state.z < 0.05;
 
         // Tell the animator whether or not the player is walking.
-        _anim.SetBool ("IsWalking", walking);
+        _anim.SetBool("IsWalking", walking);
     }
 
     // Update is called once per frame
@@ -113,6 +114,7 @@ public class ClientPlayer: MonoBehaviour
     }
 
     private int counter = 0;
+
     // --------------- Prediction Methods ----------------------
     // These are exactly as the functions in PLayerMovement but in the client
     public void Move(float h, float v)
@@ -127,7 +129,7 @@ public class ClientPlayer: MonoBehaviour
         transform.position += _movement;
 
     }
-    
+
     public void Rotation(float xA, float yA, float zA)
     {
         transform.rotation = Quaternion.Euler(xA, yA, zA);
@@ -136,6 +138,20 @@ public class ClientPlayer: MonoBehaviour
     public void Shoot()
     {
         _playerShootingClient.isShooting = true;
+
+    }
+
+    public void UpdateState()
+    {
+        var position = transform.position;
+        var rotation = transform.rotation;
+
+        state = new PlayerState(
+            position.x, position.y, position.z,
+            rotation.x, rotation.y, rotation.z,
+            currentHealth, _playerShootingClient.isShooting
+        );
+        // The shooting only is for one snapshot
 
     }
 }

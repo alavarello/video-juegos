@@ -81,13 +81,14 @@ public class Client
                 _timer += Time.deltaTime;
                 if (!_player.isDead)
                 {
-                    _player.state.sequence = _sequence;
                     SendMove();
                     SendRotation();
                     SendShot();
                     // Prediction
                     _player.UpdateHealth();
-
+                    
+                    _player.UpdateState();
+                    _player.state.sequence = _sequence;
                     _prediction.AddState(_player.state);
                 }
                 
@@ -170,7 +171,7 @@ public class Client
         _packetProcessor.SendReliableFastData(concatenation.ToArray(), _serverIpEndPoint, MessageType.Input, _sequence);
         
         // Prediction
-        _players[_engine.playerId].Move(h, v);
+       _player.Move(h, v);
     }
     
     private void SendShot()
