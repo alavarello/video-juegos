@@ -1,9 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class EnemyMovement : MonoBehaviour
 {
-    Transform player;
+
+    public static Engine engine;
+    
+    List<Transform> players;
     EnemyHealth enemyHealth;
     UnityEngine.AI.NavMeshAgent nav;
 
@@ -12,25 +16,40 @@ public class EnemyMovement : MonoBehaviour
     {
         enemyHealth = GetComponent <EnemyHealth> ();
         nav = GetComponent <UnityEngine.AI.NavMeshAgent> ();
+
+        players = engine.server.playersTransforms;
     }
-
-
+    
     void Update ()
     {
 
-        if (player == null)
+        if (players.Count == 0) return;
+
+        if(enemyHealth.currentHealth > 0)
         {
-            var playerObject = GameObject.FindGameObjectWithTag ("Player");
-            player = playerObject.transform;
-            return;
-        }
-        if(enemyHealth.currentHealth > 0 /*&& playerHealth.currentHealth > 0*/)
-        {
-            nav.SetDestination (player.position);
+            var target = GetNearestTarget();
+            nav.SetDestination (target.position);
         }
         else
         {
             nav.enabled = false;
         }
+    }
+
+    private Transform GetNearestTarget()
+    {
+        var minDistance = float.MaxValue;
+        Transform minTransform = null;
+        foreach (var playerTransform in players)
+        {
+            var distance = Vector3.Distance(transform.position, playerTransform.position);
+            if (distance < minDistance)
+            {
+                minDistance = distance;
+                minTransform = playerTransform;
+            }
+        }
+
+        return minTransform;
     }
 }

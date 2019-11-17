@@ -13,16 +13,20 @@ public class Server
     private readonly PacketProcessor _packetProcessor;
 
     private readonly Dictionary<int, Player> _players;
-    
+
+
     private readonly Engine _engine;
 
     private int _sequence = 0;
-    
+
     private float _timeForNextSnapshot = 0;
-    
+
     public static int score = 0;
 
-    
+    public readonly List<Transform> playersTransforms = new List<Transform>();
+    public readonly List<PlayerHealth> playersHealth = new List<PlayerHealth>();
+    public readonly List<GameObject> playersObjects = new List<GameObject>();
+
     // Start is called before the first frame update
     public Server(Engine engine)
     {
@@ -45,6 +49,9 @@ public class Server
             playerScript.playerHealth = playerScript.GetComponent<PlayerHealth>();
             playerScript.playerMovement = playerScript.GetComponent<PlayerMovement>();
             _players.Add(id, playerScript);
+            playersTransforms.Add(playerScript.playerMovement.transform);
+            playersHealth.Add(playerScript.playerHealth);
+            playersObjects.Add(playerScript.gameObject);
         }
         
     }
@@ -115,5 +122,16 @@ public class Server
                 BitConverter.GetBytes(score).Concat(ms.ToArray()).ToArray(), ipEndPoint, MessageType.Input, _sequence);
         }
         _sequence++;
+    }
+
+    public void playerDied(PlayerHealth playerHealth)
+    {
+        if (!playersHealth.Contains(playerHealth)) return;
+
+        var index = playersHealth.IndexOf(playerHealth);
+        playersHealth.Remove(playerHealth);
+        playersTransforms.Remove(playersTransforms[index]);
+        playersObjects.Remove(playersObjects[index]);
+        
     }
 }

@@ -4,6 +4,9 @@ using UnityEngine.SceneManagement;
 
 public class PlayerHealth : MonoBehaviour
 {
+
+    public static Engine engine;
+    
     public int startingHealth = 100;
     public int currentHealth;
 
@@ -39,5 +42,8 @@ public class PlayerHealth : MonoBehaviour
 
         _playerMovement.Dead();
         _playerShooting.Dead();
+        
+        engine.server.playerDied(this);
+        
     }
 }

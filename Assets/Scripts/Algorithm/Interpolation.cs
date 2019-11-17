@@ -30,7 +30,15 @@ public class Interpolation
             //Do nothing
             return;
         }
-        _snapshots.Add(s.sequence, s);
+
+        if (_snapshots.ContainsKey(s.sequence))
+        {
+            _snapshots[s.sequence] = s;
+        }
+        else
+        {
+            _snapshots.Add(s.sequence, s);
+        }
     }
 
 

@@ -237,16 +237,19 @@ public class Client
 
             }
 
-            if (_players[playerState.Id].currentHealth != playerState.health)
+            if (playerState.Id == _engine.playerId)
             {
-                _healthSlider.value = playerState.health;
-                _damageImage.color = _flashColour;
+                if (_players[playerState.Id].currentHealth != playerState.health)
+                {
+                    _healthSlider.value = playerState.health;
+                    _damageImage.color = _flashColour;
+                }
+                else
+                {
+                    _damageImage.color = Color.Lerp (_damageImage.color, Color.clear, FlashSpeed * Time.deltaTime);
+                }   
             }
-            else
-            {
-                _damageImage.color = Color.Lerp (_damageImage.color, Color.clear, FlashSpeed * Time.deltaTime);
-            }
-            
+
             _players[playerState.Id].SetPlayerState(playerState); 
         }
 

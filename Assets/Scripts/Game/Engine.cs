@@ -23,14 +23,17 @@ public class Engine: MonoBehaviour
 
     public int clientFps;
 
-    private Server server;
+    public Server server;
 
-    private Client client;
+    public Client client;
 
     private void Start()
     {
         if (isServer)
         {
+            EnemyMovement.engine = this;
+            EnemyAttack.engine = this;
+            PlayerHealth.engine = this;
             server = new Server(this);
         }
 
