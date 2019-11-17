@@ -53,12 +53,4 @@ public class Engine: MonoBehaviour
             server.Update();
         }
     }
-
-    private void FixedUpdate()
-    {
-        if (isClient)
-        {
-            client.FixedUpdate();
-        }
-    }
 }

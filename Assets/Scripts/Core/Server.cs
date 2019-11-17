@@ -18,7 +18,7 @@ public class Server
 
     private int _sequence = 0;
     
-    private int _updateCounter = 0;
+    private float _timeForNextSnapshot = 0;
     
     public static int score = 0;
 
@@ -57,17 +57,24 @@ public class Server
         return playerScript;
     }
 
+    private int lastMessageRecieved = -1;
     // Update is called once per frame
     public void Update()
     {
-        _updateCounter++;
-        if (_updateCounter % (60/_engine.serverSps) != 0) return;
 
+        if (Time.time < _timeForNextSnapshot) return;
+        _timeForNextSnapshot += 1f / _engine.serverSps;
+        
         var data = _packetProcessor.GetData();
          while (data != null)
          {
             foreach (var message in data)
             {
+                // Prevent ReliableFast double input problem
+                if (lastMessageRecieved >= message.messageId) continue;
+
+                lastMessageRecieved = message.messageId;
+                
                 var id = BitConverter.ToInt32(message.message, 0);
                 if (message.messageType == MessageType.Input)
                 {

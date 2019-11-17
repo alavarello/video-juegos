@@ -35,7 +35,7 @@ public class Player : MonoBehaviour
         var state = new PlayerState(
             position.x, position.y, position.z,
             rotation.x, rotation.y, rotation.z,
-            playerHealth.currentHealth, isShooting
+            playerHealth.currentHealth, isShooting, lastInputSequence
         );
         // The shooting only is for one snapshot
         isShooting = false;

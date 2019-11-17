@@ -15,7 +15,6 @@ public class ClientPlayer: MonoBehaviour
      public AudioClip deathClip;
 
      // PlayerMovement
-     public float speed = 6f;            // The speed that the player will move at.
      private Vector3 _movement;                   // The vector to store the direction of the player's movement.
 
      private float _prevX, _prevZ;
@@ -100,27 +99,20 @@ public class ClientPlayer: MonoBehaviour
         _anim.SetBool ("IsWalking", walking);
     }
 
-    private void FixedUpdate()
-    {
-        // Do not Update the Main Player do to prediction
-        if (state.Id == playerId) return;
-        UpdateMovement();
-        if (state.isShooting)
-        {
-            _playerShootingClient.isShooting = true;
-        }
-
-    }
-
     // Update is called once per frame
     private void Update()
     {
         // Do not Update the Main Player do to prediction
         if (state.Id == playerId) return;
         UpdateHealth();
+        UpdateMovement();
+        if (state.isShooting)
+        {
+            _playerShootingClient.isShooting = true;
+        }
     }
-    
-    
+
+    private int counter = 0;
     // --------------- Prediction Methods ----------------------
     // These are exactly as the functions in PLayerMovement but in the client
     public void Move(float h, float v)
@@ -129,10 +121,10 @@ public class ClientPlayer: MonoBehaviour
         _movement.Set(h, 0f, v);
 
         // Normalise the movement vector and make it proportional to the speed per second.
-        _movement = _movement.normalized * (speed * Time.deltaTime * 3);
+        _movement = _movement.normalized * 0.2f;
 
         // Move the player to it's current position plus the movement.
-        _playerRigidBody.MovePosition(transform.position + _movement);
+        transform.position += _movement;
 
     }
     

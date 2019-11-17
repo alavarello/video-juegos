@@ -47,6 +47,9 @@ public class Client
     
     private float _timer;
     
+    private float _timeForNextSnapshot = 0;
+
+    
     // Start is called before the first frame update
     public Client(Engine engine, ClientPlayer player)
     {
@@ -66,13 +69,28 @@ public class Client
     
     public void Update()
     {
+        if (Time.time < _timeForNextSnapshot) return;
+        _timeForNextSnapshot += 1f / _engine.clientFps;
+        
+
         if (_sequence != -1)
         {
             if (UpdateStates())
             {
                 _sequence++;
                 _timer += Time.deltaTime;
+                if (!_player.isDead)
+                {
+                    _player.state.sequence = _sequence;
+                    SendMove();
+                    SendRotation();
+                    SendShot();
+                    // Prediction
+                    _player.UpdateHealth();
 
+                    _prediction.AddState(_player.state);
+                }
+                
             }
         }
         var messages = _packetProcessor.GetData();
@@ -86,21 +104,9 @@ public class Client
         {
             SaveMessage(message);
         }
-    }
-
-    public void FixedUpdate()
-    {
-        if (_player.isDead) return;
-            
-        SendMove();
-        SendRotation();
-        SendShot();
-        // Prediction
-        _player.UpdateHealth();
-
-        _prediction.AddState(_player.state);
 
     }
+
 
     private void SendRotation()
     {

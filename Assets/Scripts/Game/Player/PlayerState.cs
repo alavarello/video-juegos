@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 
 [Serializable]
 public class PlayerState
@@ -35,26 +36,31 @@ public class PlayerState
         this.sequence = sequence;
     }
 
-    public PlayerState()
-    {
-    }
-
     public int Id
     {
         get => id;
         set => id = value;
     }
 
-    public bool isInTheSamePosition(PlayerState other)
-    {
-        if (Math.Abs(other.x - x) > 0.01 || Math.Abs(other.z - z) > 0.01) return false;
+    public bool IsInTheSamePosition(PlayerState other)
+    {   
+        if (Math.Abs(other.x - x) > 0.1 || Math.Abs(other.z - z) > 0.1)
+        {
+            Debug.Log("Client: " + x + " " + z + " " + sequence + " Snapshot: " + other.x + " " + other.z + " " + sequence);
+            return false;
+        }
         return true;
     }
     
-    public bool isInTheSameRotation(PlayerState other)
+    public bool IsInTheSameRotation(PlayerState other)
     {
         if (Math.Abs(other.xA - xA) > 0.1 || Math.Abs(other.zA - zA) > 0.1 || Math.Abs(other.yA - yA) > 0.1) return false;
         return true;
+    }
+
+    public PlayerState Clone()
+    {
+        return new PlayerState(x, y, z, xA, yA, zA, health, isShooting, sequence);
     }
     
 }

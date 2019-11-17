@@ -6,13 +6,13 @@ public class Prediction
 {
     private readonly SortedList<int, PlayerState> _states = new SortedList<int, PlayerState>();
 
-    private ClientPlayer _player;
-    private int _playerId;
+    private readonly ClientPlayer _player;
+    private readonly int _playerId;
 
-    public Prediction(ClientPlayer player, int playerID)
+    public Prediction(ClientPlayer player, int playerId)
     {
         _player = player;
-        _playerId = playerID;
+        _playerId = playerId;
     }
 
     public void AddState(PlayerState playerState)
@@ -22,24 +22,32 @@ public class Prediction
             //Do nothing
             return;
         }
-        _states.Add(playerState.sequence, playerState);
+
+        if (_states.ContainsKey(playerState.sequence))
+        {
+            _states[playerState.sequence] = playerState;
+        }
+        else
+        {
+            _states.Add(playerState.sequence, playerState.Clone());
+        }
+
     }
 
     public void checkState(Snapshot snapshot)
     {
         
         var playerState = snapshot.players[_playerId];
-
         if (!_states.ContainsKey(playerState.sequence)) return;
 
         // Check for position
-        if (!_states[playerState.sequence].isInTheSamePosition(playerState))
+        if (!_states[playerState.sequence].IsInTheSamePosition(playerState))
         {
             // Fix the player position (It will be updated later)
             _player.transform.position = new Vector3(playerState.x, 0 , playerState.z);
 
         }
-        if (!_states[playerState.sequence].isInTheSameRotation(playerState))
+        if (!_states[playerState.sequence].IsInTheSameRotation(playerState))
         {
             // Fix the player rotation (It will be updated later)
             _player.state.xA = playerState.xA;
@@ -48,7 +56,7 @@ public class Prediction
         }
 
         // Remove the unused sequences
-        int i = playerState.sequence;
+        var i = playerState.sequence;
         do
         {
 
