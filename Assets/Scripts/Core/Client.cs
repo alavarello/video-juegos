@@ -98,7 +98,7 @@ public class Client
                 _timer += Time.deltaTime;
                 if (!_player.isDead)
                 {
-                    SendMessage();
+                    SendInput();
                     
                     // Prediction
                     _player.UpdateHealth();
@@ -124,7 +124,7 @@ public class Client
 
     }
 
-    private void SendMessage()
+    private void SendInput()
     {
         var angles = GetRotation();
         var move = GetMove();
@@ -234,10 +234,10 @@ public class Client
             
             var playerStates = new List<PlayerState>();
 
-//            while (bitBuffer._seek < bitBuffer._length)
-//            {
+            while (bitBuffer._seek < bitBuffer._length)
+            {
                 playerStates.Add(new PlayerState(bitBuffer));
-//            }
+            }
         
             _snapshot = new Snapshot(playerStates, message.sequence);
         
@@ -262,7 +262,7 @@ public class Client
                 if (playerState.Id != _engine.playerId)
                 {
                     var playerPrefab = Resources.Load<GameObject>("Prefabs/Client/ClientPlayer");
-                    var player = GameObject.Instantiate<GameObject>(playerPrefab);  
+                    var player = GameObject.Instantiate(playerPrefab);  
                     var playerScript = player.GetComponent<ClientPlayer>();
                     players.Add(playerState.Id, playerScript);
                 }

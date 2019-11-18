@@ -7,7 +7,7 @@ public class Interpolation
 {
     private readonly SortedList<int, Snapshot> _snapshots = new SortedList<int, Snapshot>();
 
-    private const int InterpolationSequence = 5;
+    private const int InterpolationSequence = 3;
 
     private Snapshot _fromSnapshot;
     private float _fromTime;
@@ -147,8 +147,5 @@ public class Interpolation
         interpolatedSnapshot.score = _fromSnapshot.score;
         
         return interpolatedSnapshot;
-        
-//       
-
     }
 }

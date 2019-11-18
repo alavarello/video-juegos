@@ -106,7 +106,14 @@ public class Server
     public void Update()
     {
 
-        if (Time.time < _timeForNextSnapshot) return;
+        if (Time.time < _timeForNextSnapshot)
+        {
+            Debug.Log(Time.time + " " + _timeForNextSnapshot);
+            return;
+        }
+
+        Debug.Log("snapshot");
+
         _timeForNextSnapshot += 1f / _engine.serverSps;
         
         var data = _packetProcessor.GetData();
@@ -120,17 +127,18 @@ public class Server
          }
 
          BitBuffer bitBuffer = new BitBuffer();
+         
          //TODO: cada uno tiene que tener su score
          bitBuffer.PutInt(score, 0, 100);
          
-//        foreach (var playersValue in _players.Values)
-//        {
-            _players[0].GetPlayerState().serialize(bitBuffer);
-//        }
+        foreach (var playersValue in _players.Values)
+        {
+            playersValue.GetPlayerState().serialize(bitBuffer);
+        }
 
         foreach (var ipEndPoint in _ipEndPoints)
         {
-            _packetProcessor.SendUnreliableData(bitBuffer.GetPayload(), ipEndPoint, MessageType.Input, _sequence);
+            _packetProcessor.SendUnreliableData(bitBuffer.GetPayload(), ipEndPoint, MessageType.Snapshot, _sequence);
         }
         _sequence++;
     }
