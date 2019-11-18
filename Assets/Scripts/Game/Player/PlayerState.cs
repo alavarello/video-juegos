@@ -62,5 +62,38 @@ public class PlayerState
     {
         return new PlayerState(x, y, z, xA, yA, zA, health, isShooting, sequence);
     }
+
+    public PlayerState (BitBuffer bitBuffer)
+    {
+        id = bitBuffer.GetInt(0, 10);
+        
+        x = bitBuffer.GetFloat(-100, 100, (float)0.1);
+        z = bitBuffer.GetFloat(-100, 100, (float)0.1);
+
+        xA = bitBuffer.GetInt(0, 360);
+        yA = bitBuffer.GetInt(0, 360);
+        zA = bitBuffer.GetInt(0, 360);
+        
+        health = bitBuffer.GetInt(0, 100);
+        isShooting = bitBuffer.GetBit();
+        
+        sequence = bitBuffer.GetInt(0, 10000);
+    }
     
+    public void serialize(BitBuffer bitBuffer)
+    {
+        bitBuffer.PutInt(id, 0, 10);
+       
+        bitBuffer.PutFloat(x, -100, 100, (float)0.1);
+        bitBuffer.PutFloat(z, -100, 100, (float)0.1);
+
+        bitBuffer.PutInt((int) xA, 0, 360);
+        bitBuffer.PutInt((int) yA, 0, 360);
+        bitBuffer.PutInt((int) zA, 0, 360);
+        
+        bitBuffer.PutInt(health, 0, 100);
+        bitBuffer.PutBit(isShooting);
+        
+        bitBuffer.PutInt(sequence, 0, 10000);
+    }
 }

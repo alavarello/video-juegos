@@ -14,6 +14,7 @@ public class Server
 
     private readonly Dictionary<int, Player> _players;
 
+    private int _lastMessageReceived = -1;
 
     private readonly Engine _engine;
 
@@ -64,7 +65,43 @@ public class Server
         return playerScript;
     }
 
-    private int lastMessageRecieved = -1;
+    private void readMessage(Message message)
+    {
+        // Prevent ReliableFast double input problem
+        if (_lastMessageReceived >= message.messageId) return;
+
+        _lastMessageReceived = message.messageId;
+                
+        BitBuffer bitBuffer = new BitBuffer(message.message);
+
+        var id = bitBuffer.GetInt(0, 10);
+                
+        var x = bitBuffer.GetInt(0, 360);
+        var y = bitBuffer.GetInt(0, 360);
+        var z = bitBuffer.GetInt(0, 360);
+                
+        var h = bitBuffer.GetInt(-1, 1);
+        var v = bitBuffer.GetInt(-1, 1);
+
+        var shoot = bitBuffer.GetBit();
+                
+        if (message.messageType == MessageType.Input)
+        {
+            _players[id].playerMovement.Rotation(x, y, z);
+            _players[id].playerMovement.Move(h, v);
+            if (shoot)
+            {
+                _players[id].playerShooting.Shoot();
+                _players[id].isShooting = true;
+            }
+        }
+
+        if (_players[id].lastInputSequence < message.sequence)
+        {
+            _players[id].lastInputSequence = message.sequence;
+        }
+    }
+
     // Update is called once per frame
     public void Update()
     {
@@ -77,49 +114,23 @@ public class Server
          {
             foreach (var message in data)
             {
-                // Prevent ReliableFast double input problem
-                if (lastMessageRecieved >= message.messageId) continue;
-
-                lastMessageRecieved = message.messageId;
-                
-                var id = BitConverter.ToInt32(message.message, 0);
-                if (message.messageType == MessageType.Input)
-                {
-                    
-                    var h = BitConverter.ToInt32(message.message, sizeof(Int32));
-                    var v = BitConverter.ToInt32(message.message, sizeof(Int32)*2);
-                    _players[id].playerMovement.Move(h, v);
-                } else if (message.messageType == MessageType.Rotation)
-                {
-                    var x = BitConverter.ToInt32(message.message, sizeof(Int32));
-                    var y = BitConverter.ToInt32(message.message, sizeof(Int32)*2);
-                    var z = BitConverter.ToInt32(message.message, sizeof(Int32)*3);
-                    _players[id].playerMovement.Rotation(x, y, z);
-                } else if (message.messageType == MessageType.Fire)
-                {
-                   _players[id].playerShooting.Shoot();
-                   _players[id].isShooting = true;
-                }
-
-                if (_players[id].lastInputSequence < message.sequence)
-                {
-                    _players[id].lastInputSequence = message.sequence;
-                }
-
+                readMessage(message);
             }
             data = _packetProcessor.GetData();
          }
 
-        var playerStates = _players.Values.Select(player => player.GetPlayerState()).ToList();
-
-        var bf = new BinaryFormatter();
-        var ms = new MemoryStream();
-        bf.Serialize(ms, playerStates);
+         BitBuffer bitBuffer = new BitBuffer();
+         //TODO: cada uno tiene que tener su score
+         bitBuffer.PutInt(score, 0, 100);
+         
+//        foreach (var playersValue in _players.Values)
+//        {
+            _players[0].GetPlayerState().serialize(bitBuffer);
+//        }
 
         foreach (var ipEndPoint in _ipEndPoints)
         {
-            _packetProcessor.SendUnreliableData(
-                BitConverter.GetBytes(score).Concat(ms.ToArray()).ToArray(), ipEndPoint, MessageType.Input, _sequence);
+            _packetProcessor.SendUnreliableData(bitBuffer.GetPayload(), ipEndPoint, MessageType.Input, _sequence);
         }
         _sequence++;
     }
