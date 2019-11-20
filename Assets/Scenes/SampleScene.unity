@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 170076734}
-  m_IndirectSpecularColor: {r: 0.18028334, g: 0.2257134, b: 0.30692226, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028334, g: 0.22571343, b: 0.30692208, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -746,15 +746,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   serverListeningPort: 9090
-  clientListeningPort: 9091
+  clientListeningPort: 9090
   IPs:
   - 127.0.0.1
-  - 127.0.0.3
-  serverIp: 127.0.0.1
-  isServer: 1
+  serverIp: 10.17.32.250
+  isServer: 0
   isClient: 1
   playerId: 0
-  serverSps: 20
+  serverSps: 10
   clientFps: 50
 --- !u!4 &1058797112
 Transform:
@@ -1109,7 +1108,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1661079767}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 76a99222b1e4a384e923ac7e86efc709, type: 3}
   m_Name: 

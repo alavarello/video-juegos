@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -19,7 +19,7 @@ public class Client
     
     private Snapshot _snapshot;
 
-    private int _sequence = -1;
+    public int _sequence = -1;
 
     private readonly Interpolation _interpolation;
     
@@ -86,32 +86,27 @@ public class Client
     
     public void Update()
     {
-        if (Time.unscaledTime < _timeForNextSnapshot) return;
-        
-        _timeForNextSnapshot = Time.unscaledTime +  1f / _engine.clientFps;
-        
+//        if (Time.unscaledTime < _timeForNextSnapshot) return;
+//        
+//        _timeForNextSnapshot = Time.unscaledTime +  (1f / _engine.clientFps);
         if (_sequence != -1)
         {
-            if (UpdateStates())
+            UpdateStates();
+            _sequence++;
+            
+            _timer += Time.deltaTime;
+            if (!_player.isDead)
             {
-                _sequence++;
-                _sequence++;
-
-//                Debug.Log("Client : "+ (_sequence/ (float) _engine.clientFps));
+                SendInput();
                 
-                _timer += Time.deltaTime;
-                if (!_player.isDead)
-                {
-                    SendInput();
-                    
-                    // Prediction
-                    _player.UpdateHealth();
-                    _player.UpdateState();
-                    _player.state.sequence = _sequence;
-                    _prediction.AddState(_player.state);
-                }
-                
+                // Prediction
+                _player.Animating();
+                _player.UpdateHealth();
+                _player.UpdateState();
+                _player.state.sequence = _sequence;
+                _prediction.AddState(_player.state);
             }
+                
         }
         var messages = _packetProcessor.GetData();
         if (messages == null) return;
@@ -155,12 +150,7 @@ public class Client
     {
         if (_playerRigidbody == null)
         {
-            if (!players.ContainsKey(_engine.playerId))
-            {
-                return Vector3.zero;
-            }
-
-            _playerRigidbody = players[_engine.playerId].GetComponent<Rigidbody>();
+            _playerRigidbody = _player.GetComponent<Rigidbody>();
         }
         
         var currentAngles = _playerRigidbody.transform.rotation.eulerAngles;
@@ -191,7 +181,7 @@ public class Client
         var angles = newRotation.eulerAngles;
 
         // Prediction
-        players[_engine.playerId].Rotation(angles.x, angles.y, angles.z);
+        _player.Rotation(angles.x, angles.y, angles.z);
         
         return angles;
     }
@@ -220,7 +210,7 @@ public class Client
         _timer = 0;
         
         // Prediction
-        players[_engine.playerId].Shoot();
+        _player.Shoot();
 
         return true;
     }

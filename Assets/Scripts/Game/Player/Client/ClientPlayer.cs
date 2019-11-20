@@ -94,17 +94,17 @@ public class ClientPlayer : MonoBehaviour
         _playerRigidBody.MoveRotation(Quaternion.Euler(state.xA, state.yA, state.zA));
         // Animate the player.
         Animating();
-
-        _prevX = state.x;
-        _prevZ = state.z;
     }
 
-    private void Animating()
+    public void Animating()
     {
         var walking = _prevX - state.x < 0.05 || _prevZ - state.z < 0.05;
 
         // Tell the animator whether or not the player is walking.
         _anim.SetBool("IsWalking", walking);
+        
+        _prevX = state.x;
+        _prevZ = state.z;
     }
 
     // Update is called once per frame
