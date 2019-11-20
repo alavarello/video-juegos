@@ -92,26 +92,26 @@ public class Client
         
         if (_sequence != -1)
         {
-            if (UpdateStates())
-            {
-                _sequence++;
-                _sequence++;
+            UpdateStates();
+            
+            _sequence++;
 
 //                Debug.Log("Client : "+ (_sequence/ (float) _engine.clientFps));
+            
+            _timer += Time.deltaTime;
+            if (!_player.isDead)
+            {
+                SendInput();
                 
-                _timer += Time.deltaTime;
-                if (!_player.isDead)
-                {
-                    SendInput();
-                    
-                    // Prediction
-                    _player.UpdateHealth();
-                    _player.UpdateState();
-                    _player.state.sequence = _sequence;
-                    _prediction.AddState(_player.state);
-                }
-                
+                // Prediction
+                _player.UpdateHealth();
+                _player.UpdateState();
+                _player.Animating();
+                _player.state.sequence = _sequence;
+                _prediction.AddState(_player.state);
             }
+                
+            
         }
         var messages = _packetProcessor.GetData();
         if (messages == null) return;

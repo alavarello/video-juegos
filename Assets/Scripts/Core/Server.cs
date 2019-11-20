@@ -6,7 +6,7 @@ using System.Net;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 
-public class Server
+public 1class Server
 {
     private readonly List<IPEndPoint> _ipEndPoints = new List<IPEndPoint>();
 
@@ -129,9 +129,11 @@ public class Server
             playersValue.GetPlayerState().serialize(bitBuffer);
         }
 
+        var payload = bitBuffer.GetPayload();
+
         foreach (var ipEndPoint in _ipEndPoints)
         {
-            _packetProcessor.SendUnreliableData(bitBuffer.GetPayload(), ipEndPoint, MessageType.Snapshot, _sequence);
+            _packetProcessor.SendUnreliableData(payload, ipEndPoint, MessageType.Snapshot, _sequence);
         }
         _sequence++;
 //        Debug.Log("Server : "+ (_sequence/ (float) _engine.serverSps) + "Time: " + Time.time);
