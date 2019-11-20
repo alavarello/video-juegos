@@ -95,6 +95,8 @@ public class Client
             if (UpdateStates())
             {
                 _sequence++;
+                Debug.Log("Client : "+ (_sequence/ (float) _engine.clientFps));
+                
                 _timer += Time.deltaTime;
                 if (!_player.isDead)
                 {
