@@ -105,13 +105,10 @@ public class Server
     // Update is called once per frame
     public void Update()
     {
-
-        if (Time.time < _timeForNextSnapshot)
-        {
-            return;
-        }
         
-        _timeForNextSnapshot += 1f / _engine.serverSps;
+        if (Time.unscaledTime < _timeForNextSnapshot) return;
+        
+        _timeForNextSnapshot = Time.unscaledTime + (1f / _engine.serverSps);
         
         var data = _packetProcessor.GetData();
          while (data != null)
@@ -137,7 +134,7 @@ public class Server
             _packetProcessor.SendUnreliableData(bitBuffer.GetPayload(), ipEndPoint, MessageType.Snapshot, _sequence);
         }
         _sequence++;
-        Debug.Log("Server : "+ (_sequence/ (float) _engine.serverSps));
+//        Debug.Log("Server : "+ (_sequence/ (float) _engine.serverSps) + "Time: " + Time.time);
     }
 
     public void playerDied(PlayerHealth playerHealth)

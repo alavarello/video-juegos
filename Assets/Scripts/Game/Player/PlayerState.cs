@@ -46,7 +46,7 @@ public class PlayerState
     {   
         if (Math.Abs(other.x - x) > 0.1 || Math.Abs(other.z - z) > 0.1)
         {
-            Debug.Log("Client: " + x + " " + z + " " + sequence + " Snapshot: " + other.x + " " + other.z + " " + sequence);
+//            Debug.Log("Client: " + x + " " + z + " " + sequence + " Snapshot: " + other.x + " " + other.z + " " + sequence);
             return false;
         }
         return true;

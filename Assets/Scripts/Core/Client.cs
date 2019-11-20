@@ -86,16 +86,18 @@ public class Client
     
     public void Update()
     {
-        if (Time.time < _timeForNextSnapshot) return;
-        _timeForNextSnapshot += 1f / _engine.clientFps;
+        if (Time.unscaledTime < _timeForNextSnapshot) return;
         
-
+        _timeForNextSnapshot = Time.unscaledTime +  1f / _engine.clientFps;
+        
         if (_sequence != -1)
         {
             if (UpdateStates())
             {
                 _sequence++;
-                Debug.Log("Client : "+ (_sequence/ (float) _engine.clientFps));
+                _sequence++;
+
+//                Debug.Log("Client : "+ (_sequence/ (float) _engine.clientFps));
                 
                 _timer += Time.deltaTime;
                 if (!_player.isDead)

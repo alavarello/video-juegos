@@ -7,7 +7,7 @@ public class Interpolation
 {
     private readonly SortedList<int, Snapshot> _snapshots = new SortedList<int, Snapshot>();
 
-    private const int InterpolationSequence = 3;
+    private const int InterpolationSequence = 1;
 
     private Snapshot _fromSnapshot;
     private float _fromTime;
@@ -102,7 +102,12 @@ public class Interpolation
     {
         
         var interpolationTime = GetClientTime(clientSequence);
-        
+
+//        Debug.Log("empieza");
+//        foreach (var snapshot in _snapshots)
+//        {
+//            Debug.Log(snapshot);
+//        }
         
         var currentFromSnapshot = GetSnapshotByDefect(interpolationTime);
         if (currentFromSnapshot != _fromSnapshot && _fromSnapshot != null)
@@ -117,7 +122,6 @@ public class Interpolation
         {
             return null;
         }
-
         _toTime = GetSnapshotTime(_toSnapshot.sequence);
         _fromTime = GetSnapshotTime(_fromSnapshot.sequence);
         var from = _fromSnapshot.players;
