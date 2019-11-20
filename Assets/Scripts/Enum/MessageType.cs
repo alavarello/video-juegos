@@ -3,5 +3,5 @@
 [Serializable]
 public enum MessageType
 {
-    Ack, Snapshot, Input, Join, Rotation, Fire
+    Ack, Snapshot, Input, Join, JoinAck
 }

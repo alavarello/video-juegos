@@ -8,16 +8,14 @@ public class Engine: MonoBehaviour
     public int serverListeningPort;
     
     public int clientListeningPort;
-
-    public List<string> IPs = new List<string>();
-
+    
     public string serverIp;
     
     public bool isServer;
 
     public bool isClient;
 
-    public int playerId;
+    private int playerId;
 
     public int serverSps;
 
@@ -39,7 +37,6 @@ public class Engine: MonoBehaviour
 
         if(isClient)
         {
-            ClientPlayer.playerId = playerId;
             client = new Client(this, FindObjectOfType<ClientPlayer>());
             ClientPlayer.client = client;
             GameOverManager.client = client;
@@ -57,5 +54,15 @@ public class Engine: MonoBehaviour
         {
             server.Update();
         }
+    }
+
+    public void setPlayerId(int playerId)
+    {
+        this.playerId = playerId;
+    }
+
+    public int getPlayerId()
+    {
+        return playerId;
     }
 }

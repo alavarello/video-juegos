@@ -19,6 +19,8 @@ public class Server
     private readonly Engine _engine;
 
     private int _sequence = 0;
+    
+    private int idCounter = 0;
 
     private float _timeForNextSnapshot = 0;
 
@@ -32,29 +34,9 @@ public class Server
     public Server(Engine engine)
     {
         _engine = engine;
-        foreach (var ip in engine.IPs)
-        {
-            _ipEndPoints.Add(new IPEndPoint(IPAddress.Parse(ip), engine.clientListeningPort));
-        }
-        
+        _ipEndPoints = new List<IPEndPoint>();
         _packetProcessor = new PacketProcessor(null, engine.serverListeningPort, true);
-        
-        var idCounter = 0;
         _players = new Dictionary<int, Player>();
-        
-        foreach (var ips in engine.IPs)
-        {
-            var id = idCounter++;
-            var playerScript = CreatePlayer();
-            playerScript.id = id;
-            playerScript.playerHealth = playerScript.GetComponent<PlayerHealth>();
-            playerScript.playerMovement = playerScript.GetComponent<PlayerMovement>();
-            _players.Add(id, playerScript);
-            playersTransforms.Add(playerScript.playerMovement.transform);
-            playersHealth.Add(playerScript.playerHealth);
-            playersObjects.Add(playerScript.gameObject);
-        }
-        
     }
 
     private static Player CreatePlayer()
@@ -65,10 +47,32 @@ public class Server
         return playerScript;
     }
 
-    private void readMessage(Message message)
+    private void ReadMessage(Message message)
     {
         // Prevent ReliableFast double input problem
-        if (_lastMessageReceived >= message.messageId) return;
+        if (_lastMessageReceived > message.messageId) return;
+        
+        if (message.messageType == MessageType.Join)
+        {
+            var idPlayer = idCounter++;
+            
+            var playerScript = CreatePlayer();
+            playerScript.id = idPlayer;
+            playerScript.playerHealth = playerScript.GetComponent<PlayerHealth>();
+            playerScript.playerMovement = playerScript.GetComponent<PlayerMovement>();
+            _players.Add(idPlayer, playerScript);
+            playersTransforms.Add(playerScript.playerMovement.transform);
+            playersHealth.Add(playerScript.playerHealth);
+            playersObjects.Add(playerScript.gameObject);
+
+            _ipEndPoints.Add(message.from);
+
+            BitBuffer buffer = new BitBuffer();
+            buffer.PutInt(idPlayer, 0, 10);
+            
+            _packetProcessor.SendReliableFastData(buffer.GetPayload(), message.from, MessageType.JoinAck, _sequence);
+            return;
+        }
 
         _lastMessageReceived = message.messageId;
                 
@@ -115,7 +119,7 @@ public class Server
          {
             foreach (var message in data)
             {
-                readMessage(message);
+                ReadMessage(message);
             }
             data = _packetProcessor.GetData();
          }
@@ -129,12 +133,13 @@ public class Server
             playersValue.GetPlayerState().serialize(bitBuffer);
         }
 
+        var payload = bitBuffer.GetPayload();
+
         foreach (var ipEndPoint in _ipEndPoints)
         {
-            _packetProcessor.SendUnreliableData(bitBuffer.GetPayload(), ipEndPoint, MessageType.Snapshot, _sequence);
+            _packetProcessor.SendUnreliableData(payload, ipEndPoint, MessageType.Snapshot, _sequence);
         }
         _sequence++;
-//        Debug.Log("Server : "+ (_sequence/ (float) _engine.serverSps) + "Time: " + Time.time);
     }
 
     public void playerDied(PlayerHealth playerHealth)

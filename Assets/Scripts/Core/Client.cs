@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Net;
-using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -60,13 +57,14 @@ public class Client
         _packetProcessor = new PacketProcessor(null, engine.clientListeningPort, true);
         players = new Dictionary<int, ClientPlayer>();
         _interpolation = new Interpolation(engine);
-        _prediction = new Prediction(player, _engine.playerId);
+        _prediction = new Prediction(player, _engine.getPlayerId());
         _player = player;
         _floorMask = LayerMask.GetMask ("Floor");
         _healthSlider = GameObject.FindGameObjectsWithTag("Health")[0].GetComponent<Slider>();
         _damageImage = GameObject.FindGameObjectsWithTag("DamageImage")[0].GetComponent<Image>();
+        _packetProcessor.SendReliableFastData(null, _serverIpEndPoint, MessageType.Join, _sequence);
     }
-
+    
     public void ChangeCamera()
     {
         var i = 0;
@@ -115,7 +113,7 @@ public class Client
         }
         var messages = _packetProcessor.GetData();
         if (messages == null) return;
-        if (_sequence == -1)
+        if (_sequence == -1 && messages[0].sequence != -1)
         {
             var time = messages[0].sequence*(1.0f/_engine.serverSps);
             _sequence = Mathf.FloorToInt(time * _engine.clientFps);
@@ -137,7 +135,7 @@ public class Client
         BitBuffer bitBuffer = new BitBuffer();
         
         //TODO: cambiar rango de player id
-        bitBuffer.PutInt(_engine.playerId, 0, 10);
+        bitBuffer.PutInt(_engine.getPlayerId(), 0, 10);
         
         bitBuffer.PutInt((int)angles.x, 0, 360);
         bitBuffer.PutInt((int)angles.y, 0, 360);
@@ -155,12 +153,12 @@ public class Client
     {
         if (_playerRigidbody == null)
         {
-            if (!players.ContainsKey(_engine.playerId))
+            if (!players.ContainsKey(_engine.getPlayerId()))
             {
                 return Vector3.zero;
             }
 
-            _playerRigidbody = players[_engine.playerId].GetComponent<Rigidbody>();
+            _playerRigidbody = players[_engine.getPlayerId()].GetComponent<Rigidbody>();
         }
         
         var currentAngles = _playerRigidbody.transform.rotation.eulerAngles;
@@ -191,7 +189,7 @@ public class Client
         var angles = newRotation.eulerAngles;
 
         // Prediction
-        players[_engine.playerId].Rotation(angles.x, angles.y, angles.z);
+        players[_engine.getPlayerId()].Rotation(angles.x, angles.y, angles.z);
         
         return angles;
     }
@@ -220,16 +218,25 @@ public class Client
         _timer = 0;
         
         // Prediction
-        players[_engine.playerId].Shoot();
+        players[_engine.getPlayerId()].Shoot();
 
         return true;
     }
 
     private void SaveMessage(Message message)
     {
-        if (message != null)
+        if (message != null && message.message != null)
         {
             var bitBuffer = new BitBuffer(message.message);
+
+            if (message.messageType == MessageType.JoinAck)
+            {
+                var playerId = bitBuffer.GetInt(0, 10);
+                _engine.setPlayerId(playerId);
+                ClientPlayer.playerId = playerId;
+                return;
+            }
+            
 
             var score = bitBuffer.GetInt(0, 100);
 
@@ -263,7 +270,7 @@ public class Client
         {
             if(!players.ContainsKey(playerState.Id))
             {
-                if (playerState.Id != _engine.playerId)
+                if (playerState.Id != _engine.getPlayerId())
                 {
                     var playerPrefab = Resources.Load<GameObject>("Prefabs/Client/ClientPlayer");
                     var player = GameObject.Instantiate(playerPrefab);  
@@ -279,7 +286,7 @@ public class Client
                 }
             }
 
-            if (playerState.Id == _engine.playerId)
+            if (playerState.Id == _engine.getPlayerId())
             {
                 if (players[playerState.Id].currentHealth != playerState.health)
                 {
