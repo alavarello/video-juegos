@@ -11,6 +11,20 @@ public class PlayerState
     public bool isShooting;
     public int sequence;
 
+
+    public PlayerState(int id, float x, float y, float z, float xA, float yA, float zA, int health, bool isShooting)
+    {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.xA = xA;
+        this.yA = yA;
+        this.zA = zA;
+        this.health = health;
+        this.isShooting = isShooting;
+        this.id = id;
+    }
+    
     public PlayerState(float x, float y, float z, float xA, float yA, float zA, int health, bool isShooting)
     {
         this.x = x;

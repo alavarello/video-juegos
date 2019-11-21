@@ -155,7 +155,7 @@ public class ClientPlayer : MonoBehaviour
         var position = transform.position;
         var rotation = transform.rotation;
 
-        state = new PlayerState(
+        state = new PlayerState(playerId,
             position.x, position.y, position.z,
             rotation.x, rotation.y, rotation.z,
             currentHealth, _playerShootingClient.isShooting

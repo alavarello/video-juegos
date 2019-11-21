@@ -193,7 +193,7 @@ Light:
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 0, y: 4e-45, z: 1.864e-42, w: 1.05e-43}
+  m_BoundingSphereOverride: {x: 2.634e-42, y: 1.02e-43, z: 0, w: 0}
   m_UseBoundingSphereOverride: 0
   m_ShadowRadius: 0
   m_ShadowAngle: 0
@@ -776,13 +776,14 @@ MonoBehaviour:
   serverListeningPort: 9090
   clientListeningPort: 9091
   IPs:
+  - 10.17.32.179
   - 127.0.0.1
   serverIp: 127.0.0.1
   isServer: 1
   isClient: 1
-  playerId: 0
+  playerId: 1
   serverSps: 10
-  clientFps: 50
+  clientFps: 60
 --- !u!4 &1058797112
 Transform:
   m_ObjectHideFlags: 0
@@ -1203,7 +1204,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1661079767}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 76a99222b1e4a384e923ac7e86efc709, type: 3}
   m_Name: 
