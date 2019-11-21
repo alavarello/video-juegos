@@ -114,17 +114,22 @@ public class Client
             
         }
         var messages = _packetProcessor.GetData();
-        if (messages == null) return;
-        if (_sequence == -1)
+        while (messages != null)
         {
-            var time = messages[0].sequence*(1.0f/_engine.serverSps);
-            _sequence = 1;
+            Debug.Log(messages[0].sequence);
+            if (_sequence == -1)
+            {
+                var time = messages[0].sequence * (1.0f / _engine.serverSps);
+                _sequence = 1;
+            }
+
+            foreach (var message in messages)
+            {
+                SaveMessage(message);
+            }
+
+            messages = _packetProcessor.GetData();
         }
-        foreach (var message in messages)
-        {
-            SaveMessage(message);
-        }
-        
 
     }
 
