@@ -21,8 +21,6 @@ public class Engine: MonoBehaviour
 
     public int serverSps;
 
-    public int clientFps;
-
     public Server server;
 
     public Client client;

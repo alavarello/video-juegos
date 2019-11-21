@@ -5,9 +5,9 @@ using UnityEngine;
 
 public class Interpolation
 {
-    private readonly SortedList<int, Snapshot> _snapshots = new SortedList<int, Snapshot>();
+    private readonly Queue<Snapshot> _snapshots = new Queue<Snapshot>();
 
-    private const int InterpolationSequence = 1;
+    private const int InterpolationSequence = 3;
 
     private Snapshot _fromSnapshot;
     private float _fromTime;
@@ -16,41 +16,45 @@ public class Interpolation
     private float _toTime;
 
     private readonly Engine _engine;
-    
+
+    private float baseTime = 0;
+    private float previousTime;
 
     public Interpolation(Engine engine)
     {
         this._engine = engine;
     }
 
+
     public void AddSnapshot(Snapshot s)
     {
-        if (_snapshots.Count != 0  && _snapshots.Values[0].sequence >= s.sequence)
+        if (_snapshots.Count == 0)
+        {
+            // Reset time
+            baseTime = GetSnapshotTime(s.sequence);
+            previousTime = Time.time;
+        }
+        if (_snapshots.Count != 0  && _snapshots.Peek().sequence >= s.sequence)
         {
             //Do nothing
             return;
         }
 
-        if (_snapshots.ContainsKey(s.sequence))
-        {
-            _snapshots[s.sequence] = s;
-        }
-        else
-        {
-            _snapshots.Add(s.sequence, s);
-        }
-//        Debug.Log(s.sequence);
+        if (_snapshots.Contains(s)) return;
+       
+       
+        _snapshots.Enqueue(s);
+        
     }
-
 
     private Snapshot GetSnapshotByExcess(float time)
     {
         foreach (var snapshot in _snapshots)
         {
-            var snapshotTime = GetSnapshotTime(snapshot.Key);
+            var snapshotTime = GetSnapshotTime(snapshot.sequence);
             if (snapshotTime > time)
             {
-                return snapshot.Value;
+                return snapshot;
             }
 
         }
@@ -64,33 +68,40 @@ public class Interpolation
         
     }
 
-    private float GetClientTime(int sequence)
+    private float GetClientTime()
     {
-        return sequence / (float) _engine.clientFps;
-    }
 
+       
+        baseTime += (Time.deltaTime);
+        return baseTime;
+    }
+    
     private Snapshot GetSnapshotByDefect(float time)
     {
-        var flag = false;
-        Snapshot lastSnapshot = null;
-        foreach (var snapshot in _snapshots)
+        if (_snapshots.Count < 2)
+            return null;
+
+        var firstTime = GetSnapshotTime(_snapshots.Peek().sequence);
+        if (time < firstTime)
         {
-            var snapshotTime = GetSnapshotTime(snapshot.Key);
-            
-            if (snapshotTime <= time)
-            {
-                lastSnapshot = snapshot.Value;
-                flag = true;
-            }
-
-            if (snapshotTime > time && flag)
-            {
-                return lastSnapshot;
-            }
-
+            baseTime = firstTime;
+            return null;
         }
 
-        return null;
+        while (_snapshots.Count > 1)
+        {
+            var secondTime = GetSnapshotTime(_snapshots.ElementAt(1).sequence);
+            if (time > secondTime)
+                _snapshots.Dequeue();
+            else
+            {
+                return _snapshots.Peek();
+            }
+        }
+
+        if (_snapshots.Count == 0) return null;
+
+        return _snapshots.Peek();
     }
 
     private Boolean CanInterpolate()
@@ -102,27 +113,25 @@ public class Interpolation
     public Snapshot Interpolate(int clientSequence)
     {
         
-        var interpolationTime = GetClientTime(clientSequence);
-
-        var currentFromSnapshot = GetSnapshotByDefect(interpolationTime);
-        if (currentFromSnapshot != _fromSnapshot && _fromSnapshot != null)
-        {
-            _snapshots.Remove(_fromSnapshot.sequence);
-
-        }
-        _fromSnapshot = currentFromSnapshot;
         
+        var interpolationTime = baseTime;
+
         _toSnapshot = GetSnapshotByExcess(interpolationTime);
+        _fromSnapshot = GetSnapshotByDefect(interpolationTime);
         if (!CanInterpolate() || _snapshots.Count < InterpolationSequence)
         {
             return null;
         }
+        GetClientTime();
+        
         _toTime = GetSnapshotTime(_toSnapshot.sequence);
         _fromTime = GetSnapshotTime(_fromSnapshot.sequence);
         var from = _fromSnapshot.players;
         var to = _toSnapshot.players;
         var amountOfPlayers = Math.Min(from.Count, to.Count);
-        
+        Debug.Log("Count :" + _snapshots.Count);
+        Debug.Log("Snapshot Time:"  + _fromTime);
+        Debug.Log("Base time:"  + baseTime);
         var interpolatedSnapshot = new Snapshot();
         for(var i = 0; i < amountOfPlayers; i++)
         {
@@ -143,8 +152,8 @@ public class Interpolation
             interpolatedSnapshot.players.Add(cubeState);
         }
 
-        interpolatedSnapshot.score = _fromSnapshot.score;
-        
+        if(_fromSnapshot.score > ScoreManager.score)
+            ScoreManager.score = _fromSnapshot.score;
         return interpolatedSnapshot;
     }
 }

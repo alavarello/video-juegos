@@ -118,7 +118,7 @@ public class Client
         if (_sequence == -1)
         {
             var time = messages[0].sequence*(1.0f/_engine.serverSps);
-            _sequence = Mathf.FloorToInt(time * _engine.clientFps);
+            _sequence = 1;
         }
         foreach (var message in messages)
         {
@@ -230,9 +230,6 @@ public class Client
 
             var score = bitBuffer.GetInt(0, 100);
 
-            if(score > ScoreManager.score)
-                ScoreManager.score = score;
-            
             var playerStates = new List<PlayerState>();
 
             while (bitBuffer._seek < bitBuffer._length)
@@ -241,7 +238,8 @@ public class Client
             }
         
             _snapshot = new Snapshot(playerStates, message.sequence);
-        
+            _snapshot.score = score;
+            Debug.Log("SERVER MESSAGE: " + score);
             _interpolation.AddSnapshot(_snapshot);
             
             _prediction.checkState(_snapshot);

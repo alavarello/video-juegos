@@ -753,8 +753,7 @@ MonoBehaviour:
   isServer: 1
   isClient: 1
   playerId: 0
-  serverSps: 30
-  clientFps: 50
+  serverSps: 10
 --- !u!4 &1058797112
 Transform:
   m_ObjectHideFlags: 0
@@ -1108,7 +1107,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1661079767}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 76a99222b1e4a384e923ac7e86efc709, type: 3}
   m_Name: 
