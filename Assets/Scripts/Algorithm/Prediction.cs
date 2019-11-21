@@ -76,11 +76,12 @@ public class Prediction
 
     private PlayerState GetPlayerState(int sequence)
     {
+        if (_states.Count == 0) return null;
         var playerState = _states.Peek();
-        while (sequence > playerState.sequence)
+        while (sequence > playerState.sequence && _states.Count > 0)
             playerState = _states.Dequeue();
         var input = inputs.Peek();
-        while (sequence > input.sequence)
+        while (sequence > input.sequence && inputs.Count > 0)
             input = inputs.Dequeue();
 
         return playerState.sequence != sequence ? null : playerState;
