@@ -129,9 +129,9 @@ public class Interpolation
         var from = _fromSnapshot.players;
         var to = _toSnapshot.players;
         var amountOfPlayers = Math.Min(from.Count, to.Count);
-        Debug.Log("Count :" + _snapshots.Count);
-        Debug.Log("Snapshot Time:"  + _fromTime);
-        Debug.Log("Base time:"  + baseTime);
+//        Debug.Log("Count :" + _snapshots.Count);
+//        Debug.Log("Snapshot Time:"  + _fromTime);
+//        Debug.Log("Base time:"  + baseTime);
         var interpolatedSnapshot = new Snapshot();
         for(var i = 0; i < amountOfPlayers; i++)
         {

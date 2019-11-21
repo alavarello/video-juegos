@@ -239,7 +239,7 @@ public class Client
         
             _snapshot = new Snapshot(playerStates, message.sequence);
             _snapshot.score = score;
-            Debug.Log("SERVER MESSAGE: " + score);
+//            Debug.Log("SERVER MESSAGE: " + score);
             _interpolation.AddSnapshot(_snapshot);
             
             _prediction.checkState(_snapshot);

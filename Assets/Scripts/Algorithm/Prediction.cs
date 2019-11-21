@@ -1,5 +1,6 @@
 
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Prediction
@@ -75,10 +76,10 @@ public class Prediction
 
     private PlayerState GetPlayerState(int sequence)
     {
-        var playerState = _states.Dequeue();
+        var playerState = _states.Peek();
         while (sequence > playerState.sequence)
             playerState = _states.Dequeue();
-        var input = inputs.Dequeue();
+        var input = inputs.Peek();
         while (sequence > input.sequence)
             input = inputs.Dequeue();
 
