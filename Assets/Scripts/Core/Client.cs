@@ -86,9 +86,9 @@ public class Client
     
     public void Update()
     {
-        if (Time.unscaledTime < _timeForNextSnapshot) return;
-        
-        _timeForNextSnapshot = Time.unscaledTime +  1f / _engine.clientFps;
+//        if (Time.unscaledTime < _timeForNextSnapshot) return;
+//        
+//        _timeForNextSnapshot = Time.unscaledTime +  1f / _engine.clientFps;
         
         if (_sequence != -1)
         {
@@ -134,6 +134,7 @@ public class Client
         var move = GetMove();
         var shoot = GetShot();
         
+        _prediction.AddInputs(_sequence, (int)move.x, (int)move.y, (int)angles.y);
         BitBuffer bitBuffer = new BitBuffer();
         
         //TODO: cambiar rango de player id
@@ -155,12 +156,8 @@ public class Client
     {
         if (_playerRigidbody == null)
         {
-            if (!players.ContainsKey(_engine.playerId))
-            {
-                return Vector3.zero;
-            }
-
-            _playerRigidbody = players[_engine.playerId].GetComponent<Rigidbody>();
+            
+            _playerRigidbody = _player.GetComponent<Rigidbody>();
         }
         
         var currentAngles = _playerRigidbody.transform.rotation.eulerAngles;
@@ -191,7 +188,7 @@ public class Client
         var angles = newRotation.eulerAngles;
 
         // Prediction
-        players[_engine.playerId].Rotation(angles.x, angles.y, angles.z);
+        _player.Rotation(angles.x, angles.y, angles.z);
         
         return angles;
     }
@@ -220,7 +217,7 @@ public class Client
         _timer = 0;
         
         // Prediction
-        players[_engine.playerId].Shoot();
+        _player.Shoot();
 
         return true;
     }

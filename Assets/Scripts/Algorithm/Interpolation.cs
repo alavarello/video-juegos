@@ -39,6 +39,7 @@ public class Interpolation
         {
             _snapshots.Add(s.sequence, s);
         }
+//        Debug.Log(s.sequence);
     }
 
 
@@ -103,12 +104,6 @@ public class Interpolation
         
         var interpolationTime = GetClientTime(clientSequence);
 
-//        Debug.Log("empieza");
-//        foreach (var snapshot in _snapshots)
-//        {
-//            Debug.Log(snapshot);
-//        }
-        
         var currentFromSnapshot = GetSnapshotByDefect(interpolationTime);
         if (currentFromSnapshot != _fromSnapshot && _fromSnapshot != null)
         {

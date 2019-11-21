@@ -6,7 +6,7 @@ using System.Net;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 
-public 1class Server
+public class Server
 {
     private readonly List<IPEndPoint> _ipEndPoints = new List<IPEndPoint>();
 
