@@ -74,7 +74,9 @@ public class PlayerState
 
     public PlayerState Clone()
     {
-        return new PlayerState(x, y, z, xA, yA, zA, health, isShooting, sequence);
+        var state =  new PlayerState(x, y, z, xA, yA, zA, health, isShooting, sequence);
+        state.id = id;
+        return state;
     }
 
     public PlayerState (BitBuffer bitBuffer)

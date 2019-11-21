@@ -37,6 +37,7 @@ public class Player : MonoBehaviour
             rotation.x, rotation.y, rotation.z,
             playerHealth.currentHealth, isShooting, lastInputSequence
         );
+        state.Id = id;
         // The shooting only is for one snapshot
         isShooting = false;
         state.Id = id;
