@@ -14,7 +14,6 @@ public class Server
 
     private readonly Dictionary<int, Player> _players;
 
-    private int _lastMessageReceived = -1;
 
     private readonly Engine _engine;
 
@@ -23,6 +22,8 @@ public class Server
     private float _timeForNextSnapshot = 0;
 
     public static int score = 0;
+    
+    private Dictionary<int, int> _lastMessageReceived = new Dictionary<int, int>();
 
     public readonly List<Transform> playersTransforms = new List<Transform>();
     public readonly List<PlayerHealth> playersHealth = new List<PlayerHealth>();
@@ -68,14 +69,15 @@ public class Server
     private void readMessage(Message message)
     {
         // Prevent ReliableFast double input problem
-        if (_lastMessageReceived >= message.messageId) return;
-
-        _lastMessageReceived = message.messageId;
+        
                 
         BitBuffer bitBuffer = new BitBuffer(message.message);
 
         var id = bitBuffer.GetInt(0, 10);
-                
+        if (_lastMessageReceived.ContainsKey(id) && _lastMessageReceived[id] >= message.messageId) return;
+
+        _lastMessageReceived[id] = message.messageId;
+
         var x = bitBuffer.GetInt(0, 360);
         var y = bitBuffer.GetInt(0, 360);
         var z = bitBuffer.GetInt(0, 360);
