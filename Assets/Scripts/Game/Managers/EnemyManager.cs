@@ -27,8 +27,17 @@ public class EnemyManager : MonoBehaviour
         var position = spawnPoints[spawnPointIndex].position;
         var rotations = spawnPoints[spawnPointIndex].rotation;
 
-        Server.enemies[enemyIdCounter++] = new Enemy();
+        enemy = Instantiate (enemy, position, rotations);
+        
+        var enemyScript = new Enemy();
 
-        Instantiate (enemy, position, rotations);
+        enemyScript.id = enemyIdCounter;
+        enemyScript._enemyAttack = enemy.GetComponent<EnemyAttack>();
+        enemyScript._enemyMovement = enemy.GetComponent<EnemyMovement>();
+        enemyScript._enemyHealth = enemy.GetComponent<EnemyHealth>();
+
+        Server.enemies[enemyIdCounter] = enemyScript;
+
+        enemyIdCounter++;
     }
 }

@@ -46,4 +46,9 @@ public class EnemyState
 
         bitBuffer.PutInt(health, 0, 100);
     }
+
+    public override string ToString()
+    {
+        return id + " " + x + " " + z + " " + yA + " " + health;
+    }
 }

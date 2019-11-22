@@ -1,11 +1,12 @@
-public class Enemy
+using UnityEngine;
+
+public class Enemy 
 {
     public int id;
     
-    private EnemyAttack _enemyAttack;
-    private EnemyMovement _enemyMovement;
-    private EnemyHealth _enemyHealth;
-
+    public EnemyAttack _enemyAttack;
+    public EnemyMovement _enemyMovement;
+    public EnemyHealth _enemyHealth;
 
     public EnemyState GetEnemyState()
     {
@@ -14,5 +15,10 @@ public class Enemy
         var health = _enemyHealth.currentHealth;
         
         return new EnemyState(id, position.x, position.y, position.z, rotation.x, rotation.y, rotation.z, health);
+    }
+
+    public override string ToString()
+    {
+        return GetEnemyState().ToString();
     }
 }
