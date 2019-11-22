@@ -129,7 +129,7 @@ public class Interpolation
             var toRotateVector = new Vector3(toEnemy.xA, toEnemy.yA, toEnemy.zA);
             var rotation = Vector3.Lerp(fromRotateVector, toRotateVector, n);
             
-            var state = new EnemyState(
+            var state = new EnemyState(fromEnemy.id,
                 vector.x, vector.y, vector.z,  
                 rotation.x, rotation.y, rotation.z,
                 fromEnemy.health

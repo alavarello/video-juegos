@@ -93,7 +93,7 @@ public class PlayerState
         sequence = bitBuffer.GetInt(0, 10000);
     }
     
-    public void serialize(BitBuffer bitBuffer)
+    public void Serialize(BitBuffer bitBuffer)
     {
         bitBuffer.PutInt(id, 0, 10);
        

@@ -7,16 +7,9 @@ public class EnemyState
     public float x, y, z;
     public float xA, yA, zA;
 
-    public EnemyState(int health, Vector3 position)
+    public EnemyState(int id, float x, float y, float z, float xA, float yA, float zA, int health)
     {
-        this.health = health;
-        x = position.x;
-        y = position.y;
-        z = position.z;
-    }
-
-    public EnemyState(float x, float y, float z, float xA, float yA, float zA, int health)
-    {
+        this.id = id;
         this.health = health;
         this.x = x;
         this.y = y;

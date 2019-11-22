@@ -5,6 +5,8 @@ public class EnemyManager : MonoBehaviour
     public GameObject enemy;
     public float spawnTime = 3f;
     public Transform[] spawnPoints;
+    public static int enemyIdCounter;
+
     
     // TODO ADD game over
     private bool gameOver = false; 
@@ -21,8 +23,12 @@ public class EnemyManager : MonoBehaviour
             return;
         }
 
-        int spawnPointIndex = Random.Range (0, spawnPoints.Length);
+        var spawnPointIndex = Random.Range(0, spawnPoints.Length);
+        var position = spawnPoints[spawnPointIndex].position;
+        var rotations = spawnPoints[spawnPointIndex].rotation;
 
-        Instantiate (enemy, spawnPoints[spawnPointIndex].position, spawnPoints[spawnPointIndex].rotation);
+        Server.enemies[enemyIdCounter++] = new Enemy();
+
+        Instantiate (enemy, position, rotations);
     }
 }

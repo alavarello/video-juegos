@@ -69,21 +69,6 @@ public class Client
         _damageImage = GameObject.FindGameObjectsWithTag("DamageImage")[0].GetComponent<Image>();
     }
 
-    public void ChangeCamera()
-    {
-        var i = 0;
-        foreach (var player in players.Values)
-        {
-            if(!player.isDead)
-            {
-                var camera = GameObject.Find("Main Camera");
-                camera.GetComponent<CameraFollow>().target = player.transform;
-                cameraPlayer = player;
-            }
-            
-        }
-    }
-    
     public void Update()
     {
         if (_sequence != -1)
@@ -121,7 +106,21 @@ public class Client
 
             messages = _packetProcessor.GetData();
         }
-
+    }
+    
+    public void ChangeCamera()
+    {
+        var i = 0;
+        foreach (var player in players.Values)
+        {
+            if(!player.isDead)
+            {
+                var camera = GameObject.Find("Main Camera");
+                camera.GetComponent<CameraFollow>().target = player.transform;
+                cameraPlayer = player;
+            }
+            
+        }
     }
 
     private void SendInput()

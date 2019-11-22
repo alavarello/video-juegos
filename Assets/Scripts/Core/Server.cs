@@ -14,6 +14,8 @@ public class Server
 
     private readonly Dictionary<int, Player> _players;
     
+    public static Dictionary<int, Enemy> enemies;
+    
     private readonly Engine _engine;
 
     private int _sequence = 0;
@@ -24,7 +26,6 @@ public class Server
     
     private Dictionary<int, int> _lastMessageReceived = new Dictionary<int, int>();
     
-    private List<Enemy> _enemies = new List<Enemy>();
 
     public readonly List<Transform> playersTransforms = new List<Transform>();
     public readonly List<PlayerHealth> playersHealth = new List<PlayerHealth>();
@@ -43,6 +44,7 @@ public class Server
         
         var idCounter = 0;
         _players = new Dictionary<int, Player>();
+        enemies = new Dictionary<int, Enemy>();
         
         foreach (var ips in engine.IPs)
         {
@@ -113,12 +115,12 @@ public class Server
          
         foreach (var playersValue in _players.Values)
         {
-            playersValue.GetPlayerState().serialize(bitBuffer);
+            playersValue.GetPlayerState().Serialize(bitBuffer);
         }
 
-        bitBuffer.PutInt(_enemies.Count, 0, 100);
+        bitBuffer.PutInt(enemies.Count, 0, 100);
 
-        foreach (var enemy in _enemies)
+        foreach (var enemy in enemies.Values)
         {
             enemy.GetEnemyState().Serialize(bitBuffer);
         }
