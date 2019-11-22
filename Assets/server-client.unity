@@ -776,7 +776,7 @@ MonoBehaviour:
   serverListeningPort: 9090
   clientListeningPort: 9091
   IPs: []
-  serverIp: 10.17.66.126
+  serverIp: 192.168.38.1
   isServer: 0
   isClient: 1
   playerId: 1

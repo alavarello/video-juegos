@@ -223,7 +223,7 @@ public class Client
         {
             var bitBuffer = new BitBuffer(message.message);
 
-            var score = bitBuffer.GetInt(0, 100);
+            var score = bitBuffer.GetInt(0, 1000);
             var playerCount = bitBuffer.GetInt(0, 10);
 
             var playerStates = new List<PlayerState>();

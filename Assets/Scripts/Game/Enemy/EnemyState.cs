@@ -21,7 +21,7 @@ public class EnemyState
 
     public EnemyState(BitBuffer bitBuffer)
     {
-        id = bitBuffer.GetInt(0, 10);
+        id = bitBuffer.GetInt(0, 100);
 
         x = bitBuffer.GetFloat(-100, 100, (float)0.1);
         z = bitBuffer.GetFloat(-100, 100, (float)0.1);
