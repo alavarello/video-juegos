@@ -17,6 +17,8 @@ public class Client
 
     public readonly Dictionary<int, ClientPlayer> players;
     
+    public Dictionary<int, ClientEnemy> enemies;
+    
     private Snapshot _snapshot;
 
     private int _sequence = -1;
@@ -81,22 +83,14 @@ public class Client
             
         }
     }
-
-    // Update is called once per frame
     
     public void Update()
     {
-//        if (Time.unscaledTime < _timeForNextSnapshot) return;
-//        
-//        _timeForNextSnapshot = Time.unscaledTime +  1f / _engine.clientFps;
-        
         if (_sequence != -1)
         {
             UpdateStates();
             
             _sequence++;
-
-//                Debug.Log("Client : "+ (_sequence/ (float) _engine.clientFps));
             
             _timer += Time.deltaTime;
             if (!_player.isDead)
@@ -110,16 +104,13 @@ public class Client
                 _player.state.sequence = _sequence;
                 _prediction.AddState(_player.state);
             }
-                
-            
         }
+        
         var messages = _packetProcessor.GetData();
         while (messages != null)
         {
-            Debug.Log(messages[0].sequence);
             if (_sequence == -1)
             {
-                var time = messages[0].sequence * (1.0f / _engine.serverSps);
                 _sequence = 1;
             }
 
@@ -234,31 +225,34 @@ public class Client
             var bitBuffer = new BitBuffer(message.message);
 
             var score = bitBuffer.GetInt(0, 100);
+            var playerCount = bitBuffer.GetInt(0, 10);
 
             var playerStates = new List<PlayerState>();
+            var enemyStates = new List<EnemyState>();
 
-            while (bitBuffer._seek < bitBuffer._length)
+            for (var i = 0; i < playerCount; i++)
             {
                 playerStates.Add(new PlayerState(bitBuffer));
             }
+
+            var enemyCount = bitBuffer.GetInt(0, 100);
+            
+            for (var i = 0; i < enemyCount; i++)
+            {
+                enemyStates.Add(new EnemyState(bitBuffer));
+            }
         
-            _snapshot = new Snapshot(playerStates, message.sequence);
+            _snapshot = new Snapshot(playerStates, enemyStates, message.sequence);
             _snapshot.score = score;
-//            Debug.Log("SERVER MESSAGE: " + score);
+            
             _interpolation.AddSnapshot(_snapshot);
             
             _prediction.checkState(_snapshot);
         }
     }
 
-    private bool UpdateStates()
+    private void UpdatePlayers(Snapshot interpolatedSnapshot)
     {
-        var interpolatedSnapshot = _interpolation.Interpolate(_sequence);
-        if (interpolatedSnapshot == null)
-        {
-            return false;
-        }
-
         foreach (var playerState in interpolatedSnapshot.players)
         {
             if(!players.ContainsKey(playerState.Id))
@@ -294,7 +288,37 @@ public class Client
 
             players[playerState.Id].SetPlayerState(playerState); 
         }
+    }
+    
+    private void UpdateEnemies(Snapshot interpolatedSnapshot)
+    {
+        foreach (var enemyState in interpolatedSnapshot.enemies)
+        {
+            if(!enemies.ContainsKey(enemyState.id))
+            {
+                var enemyPrefab = Resources.Load<GameObject>("Prefabs/Client/ZomBunny");
+                var enemy = GameObject.Instantiate(enemyPrefab);  
+                var enemyScript = enemy.GetComponent<ClientEnemy>();
+                enemies.Add(enemyState.id, enemyScript);
+            }
+            else
+            {
+                if (enemies[enemyState.id].state.health != enemyState.health)
+                {
+                    //simular disparo
+                }
+                
+                enemies[enemyState.id].state = enemyState; 
+            }
+        }
+    }
 
-        return true;
+    private void UpdateStates()
+    {
+        var interpolatedSnapshot = _interpolation.Interpolate();
+        if (interpolatedSnapshot == null) return;
+
+        UpdatePlayers(interpolatedSnapshot);
+        UpdateEnemies(interpolatedSnapshot);
     }
 }

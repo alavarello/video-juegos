@@ -108,12 +108,70 @@ public class Interpolation
     {
         return _fromSnapshot != null && _toSnapshot != null;
     }
+
+    private void interpolateEnemies(float interpolationTime, Snapshot interpolatedSnapshot)
+    {
+        var fromEnemies = _fromSnapshot.enemies;
+        var toEnemies = _toSnapshot.enemies;
+        var amountOfEnemies = Math.Min(fromEnemies.Count, toEnemies.Count);
+
+        for(var i = 0; i < amountOfEnemies; i++)
+        {
+            EnemyState fromEnemy = fromEnemies[i];
+            EnemyState toEnemy = toEnemies[i];
+            
+            var fromVector = new Vector3(fromEnemy.x, fromEnemy.y, fromEnemy.z);
+            var toVector = new Vector3(toEnemy.x, toEnemy.y, toEnemy.z);
+            var n = (interpolationTime - _fromTime) / (_toTime - _fromTime);
+            var vector = Vector3.Lerp(fromVector, toVector, n);
+            
+            var fromRotateVector = new Vector3(fromEnemy.xA, fromEnemy.yA, fromEnemy.zA);
+            var toRotateVector = new Vector3(toEnemy.xA, toEnemy.yA, toEnemy.zA);
+            var rotation = Vector3.Lerp(fromRotateVector, toRotateVector, n);
+            
+            var state = new EnemyState(
+                vector.x, vector.y, vector.z,  
+                rotation.x, rotation.y, rotation.z,
+                fromEnemy.health
+            );
+            
+            interpolatedSnapshot.enemies.Add(state);
+        }
+    }
+    
+    private void interpolatePlayers(float interpolationTime, Snapshot interpolatedSnapshot)
+    {
+        var from = _fromSnapshot.players;
+        var to = _toSnapshot.players;
+
+        var amountOfPlayers = Math.Min(from.Count, to.Count);
+        
+        for(var i = 0; i < amountOfPlayers; i++)
+        {
+            var fromVector = new Vector3(from[i].x, from[i].y, from[i].z);
+            var toVector = new Vector3(to[i].x, to[i].y, to[i].z);
+            var n = (interpolationTime - _fromTime) / (_toTime - _fromTime);
+            var vector = Vector3.Lerp(fromVector, toVector, n);
+            
+            var fromRotateVector = new Vector3(from[i].xA, from[i].yA, from[i].zA);
+            var toRotateVector = new Vector3(to[i].xA, to[i].yA, to[i].zA);
+            var rotation = Vector3.Lerp(fromRotateVector, toRotateVector, n);
+            
+            var cubeState = new PlayerState(
+                vector.x, vector.y, vector.z, 
+                rotation.x, rotation.y, rotation.z, 
+                from[i].health,
+                from[i].isShooting
+            );
+            
+            cubeState.Id = from[i].Id;
+            interpolatedSnapshot.players.Add(cubeState);
+        }
+    }
     
 
-    public Snapshot Interpolate(int clientSequence)
+    public Snapshot Interpolate()
     {
-        
-        
         var interpolationTime = baseTime;
 
         _toSnapshot = GetSnapshotByExcess(interpolationTime);
@@ -126,34 +184,15 @@ public class Interpolation
         
         _toTime = GetSnapshotTime(_toSnapshot.sequence);
         _fromTime = GetSnapshotTime(_fromSnapshot.sequence);
-        var from = _fromSnapshot.players;
-        var to = _toSnapshot.players;
-        var amountOfPlayers = Math.Min(from.Count, to.Count);
-//        Debug.Log("Count :" + _snapshots.Count);
-//        Debug.Log("Snapshot Time:"  + _fromTime);
-//        Debug.Log("Base time:"  + baseTime);
+        
         var interpolatedSnapshot = new Snapshot();
-        for(var i = 0; i < amountOfPlayers; i++)
-        {
-            var fromVector = new Vector3(from[i].x, from[i].y, from[i].z);
-            var toVector = new Vector3(to[i].x, to[i].y, to[i].z);
-            var n = (interpolationTime - _fromTime) / (_toTime - _fromTime);
-            var vector = Vector3.Lerp(fromVector, toVector, n);
-            var fromRotateVector = new Vector3(from[i].xA, from[i].yA, from[i].zA);
-            var toRotateVector = new Vector3(to[i].xA, to[i].yA, to[i].zA);
-            var rotation = Vector3.Lerp(fromRotateVector, toRotateVector, n);
-            var cubeState = new PlayerState(
-                vector.x, vector.y, vector.z, 
-                rotation.x, rotation.y, rotation.z, 
-                from[i].health,
-                from[i].isShooting
-                );
-            cubeState.Id = from[i].Id;
-            interpolatedSnapshot.players.Add(cubeState);
-        }
+        
+        interpolatePlayers(interpolationTime, interpolatedSnapshot);
+        interpolateEnemies(interpolationTime, interpolatedSnapshot);
 
         if(_fromSnapshot.score > ScoreManager.score)
             ScoreManager.score = _fromSnapshot.score;
+        
         return interpolatedSnapshot;
     }
 }

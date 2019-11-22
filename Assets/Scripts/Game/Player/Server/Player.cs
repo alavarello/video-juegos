@@ -30,7 +30,6 @@ public class Player : MonoBehaviour
     {
         var position = playerMovement.GetPosition();
         var rotation = playerMovement.GetRotation();
-        
 
         var state = new PlayerState(
             position.x, position.y, position.z,

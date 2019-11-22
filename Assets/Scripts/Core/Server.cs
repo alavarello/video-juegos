@@ -13,8 +13,7 @@ public class Server
     private readonly PacketProcessor _packetProcessor;
 
     private readonly Dictionary<int, Player> _players;
-
-
+    
     private readonly Engine _engine;
 
     private int _sequence = 0;
@@ -24,6 +23,8 @@ public class Server
     public static int score = 0;
     
     private Dictionary<int, int> _lastMessageReceived = new Dictionary<int, int>();
+    
+    private List<Enemy> _enemies = new List<Enemy>();
 
     public readonly List<Transform> playersTransforms = new List<Transform>();
     public readonly List<PlayerHealth> playersHealth = new List<PlayerHealth>();
@@ -66,29 +67,28 @@ public class Server
         return playerScript;
     }
 
-    private void readMessage(Message message)
+    private void ReadMessage(Message message)
     {
-        // Prevent ReliableFast double input problem
-        
-                
         BitBuffer bitBuffer = new BitBuffer(message.message);
 
         var id = bitBuffer.GetInt(0, 10);
+        
+        // Prevent ReliableFast double input problem
         if (_lastMessageReceived.ContainsKey(id) && _lastMessageReceived[id] >= message.messageId) return;
 
         _lastMessageReceived[id] = message.messageId;
 
-        var x = bitBuffer.GetInt(0, 360);
-        var y = bitBuffer.GetInt(0, 360);
-        var z = bitBuffer.GetInt(0, 360);
-                
-        var h = bitBuffer.GetInt(-1, 1);
-        var v = bitBuffer.GetInt(-1, 1);
-
-        var shoot = bitBuffer.GetBit();
-                
         if (message.messageType == MessageType.Input)
         {
+            var x = bitBuffer.GetInt(0, 360);
+            var y = bitBuffer.GetInt(0, 360);
+            var z = bitBuffer.GetInt(0, 360);
+                
+            var h = bitBuffer.GetInt(-1, 1);
+            var v = bitBuffer.GetInt(-1, 1);
+
+            var shoot = bitBuffer.GetBit();
+            
             _players[id].playerMovement.Rotation(x, y, z);
             _players[id].playerMovement.Move(h, v);
             if (shoot)
@@ -104,31 +104,23 @@ public class Server
         }
     }
 
-    // Update is called once per frame
-    public void Update()
+    private void SendMessage()
     {
-        
-        if (Time.unscaledTime < _timeForNextSnapshot) return;
-        
-        _timeForNextSnapshot = Time.unscaledTime + (1f / _engine.serverSps);
-        
-        var data = _packetProcessor.GetData();
-         while (data != null)
-         {
-            foreach (var message in data)
-            {
-                readMessage(message);
-            }
-            data = _packetProcessor.GetData();
-         }
-
-         BitBuffer bitBuffer = new BitBuffer();
+        BitBuffer bitBuffer = new BitBuffer();
          
-         bitBuffer.PutInt(score, 0, 100);
+        bitBuffer.PutInt(score, 0, 100);
+        bitBuffer.PutInt(_players.Count, 0, 10);
          
         foreach (var playersValue in _players.Values)
         {
             playersValue.GetPlayerState().serialize(bitBuffer);
+        }
+
+        bitBuffer.PutInt(_enemies.Count, 0, 100);
+
+        foreach (var enemy in _enemies)
+        {
+            enemy.GetEnemyState().Serialize(bitBuffer);
         }
 
         var payload = bitBuffer.GetPayload();
@@ -137,8 +129,27 @@ public class Server
         {
             _packetProcessor.SendUnreliableData(payload, ipEndPoint, MessageType.Snapshot, _sequence);
         }
-        _sequence++;
-//        Debug.Log("Server : "+ (_sequence/ (float) _engine.serverSps) + "Time: " + Time.time);
+    }
+
+    public void Update()
+    {
+        if (Time.unscaledTime < _timeForNextSnapshot) return;
+        
+         _timeForNextSnapshot = Time.unscaledTime + (1f / _engine.serverSps);
+        
+         var data = _packetProcessor.GetData();
+         while (data != null)
+         {
+            foreach (var message in data)
+            {
+                ReadMessage(message);
+            }
+            data = _packetProcessor.GetData();
+         }
+         
+         SendMessage();
+         
+         _sequence++;
     }
 
     public void playerDied(PlayerHealth playerHealth)
