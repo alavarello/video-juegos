@@ -158,7 +158,5 @@ public class ClientPlayer : MonoBehaviour
             rotation.x, rotation.y, rotation.z,
             currentHealth, _playerShootingClient.isShooting
         );
-        // The shooting only is for one snapshot
-
     }
 }

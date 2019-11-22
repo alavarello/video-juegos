@@ -18,6 +18,18 @@ public class EnemyState
         this.yA = yA;
         this.zA = zA;
     }
+    
+    public EnemyState(float x, float y, float z, float xA, float yA, float zA, int health)
+    {
+        this.id = id;
+        this.health = health;
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.xA = xA;
+        this.yA = yA;
+        this.zA = zA;
+    }
 
     public EnemyState(BitBuffer bitBuffer)
     {

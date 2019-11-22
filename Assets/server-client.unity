@@ -779,7 +779,7 @@ MonoBehaviour:
   serverIp: 192.168.38.1
   isServer: 0
   isClient: 1
-  playerId: 1
+  playerId: 0
   serverSps: 10
 --- !u!4 &1058797112
 Transform:

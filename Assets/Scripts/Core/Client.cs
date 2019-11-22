@@ -61,6 +61,7 @@ public class Client
         _serverIpEndPoint = new IPEndPoint(IPAddress.Parse(engine.serverIp), engine.serverListeningPort);
         _packetProcessor = new PacketProcessor(null, engine.clientListeningPort, true);
         players = new Dictionary<int, ClientPlayer>();
+        enemies = new Dictionary<int, ClientEnemy>();
         _interpolation = new Interpolation(engine);
         _prediction = new Prediction(player, _engine.playerId);
         _player = player;
@@ -219,35 +220,34 @@ public class Client
 
     private void SaveMessage(Message message)
     {
-        if (message != null)
-        {
-            var bitBuffer = new BitBuffer(message.message);
-
-            var score = bitBuffer.GetInt(0, 1000);
-            var playerCount = bitBuffer.GetInt(0, 10);
-
-            var playerStates = new List<PlayerState>();
-            var enemyStates = new List<EnemyState>();
-
-            for (var i = 0; i < playerCount; i++)
-            {
-                playerStates.Add(new PlayerState(bitBuffer));
-            }
-
-            var enemyCount = bitBuffer.GetInt(0, 100);
-            
-            for (var i = 0; i < enemyCount; i++)
-            {
-                enemyStates.Add(new EnemyState(bitBuffer));
-            }
+        if (message == null) return;
         
-            _snapshot = new Snapshot(playerStates, enemyStates, message.sequence);
-            _snapshot.score = score;
-            
-            _interpolation.AddSnapshot(_snapshot);
-            
-            _prediction.checkState(_snapshot);
+        var bitBuffer = new BitBuffer(message.message);
+
+        var score = bitBuffer.GetInt(0, 1000);
+        var playerCount = bitBuffer.GetInt(0, 10);
+
+        var playerStates = new List<PlayerState>();
+        var enemyStates = new List<EnemyState>();
+
+        for (var i = 0; i < playerCount; i++)
+        {
+            playerStates.Add(new PlayerState(bitBuffer));
         }
+
+        var enemyCount = bitBuffer.GetInt(0, 100);
+            
+        for (var i = 0; i < enemyCount; i++)
+        {
+            enemyStates.Add(new EnemyState(bitBuffer));
+        }
+        
+        _snapshot = new Snapshot(playerStates, enemyStates, message.sequence);
+        _snapshot.score = score;
+            
+        _interpolation.AddSnapshot(_snapshot);
+            
+        _prediction.checkState(_snapshot);
     }
 
     private void UpdatePlayers(Snapshot interpolatedSnapshot)
@@ -300,14 +300,12 @@ public class Client
                 var enemyScript = enemy.GetComponent<ClientEnemy>();
                 enemies.Add(enemyState.id, enemyScript);
             }
-            else
+            
+            enemies[enemyState.id].state = enemyState;
+
+            if (enemies[enemyState.id].state.health != enemyState.health)
             {
-                if (enemies[enemyState.id].state.health != enemyState.health)
-                {
-                    //simular disparo
-                }
-                
-                enemies[enemyState.id].state = enemyState; 
+                //simular disparo
             }
         }
     }
