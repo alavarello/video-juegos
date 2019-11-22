@@ -75,14 +75,14 @@ public class Client
         if (_sequence != -1)
         {
             UpdateStates();
-            
+
             _sequence++;
-            
+
             _timer += Time.deltaTime;
             if (!_player.isDead)
             {
                 SendInput();
-                
+
                 // Prediction
                 _player.UpdateHealth();
                 _player.UpdateState();
@@ -91,19 +91,15 @@ public class Client
                 _prediction.AddState(_player.state);
             }
         }
-        
+
         var messages = _packetProcessor.GetData();
         while (messages != null)
         {
             if (_sequence == -1)
-            {
                 _sequence = 1;
-            }
-
+                    
             foreach (var message in messages)
-            {
                 SaveMessage(message);
-            }
 
             messages = _packetProcessor.GetData();
         }
