@@ -15,7 +15,6 @@ public class EnemyHealth : MonoBehaviour
     ParticleSystem hitParticles;
     CapsuleCollider capsuleCollider;
     public bool isDead;
-    bool isSinking;
 
 
     void Awake ()
@@ -29,28 +28,22 @@ public class EnemyHealth : MonoBehaviour
     }
 
 
-    void Update ()
-    {
-        if(isSinking)
-        {
-            transform.Translate (-Vector3.up * sinkSpeed * Time.deltaTime);
-        }
-    }
-
-
     public void TakeDamage (int amount, Vector3 hitPoint)
     {
         if(isDead)
             return;
 
         currentHealth -= amount;
-            
         hitParticles.transform.position = hitPoint;
         hitParticles.Play();
-
         if(currentHealth <= 0)
         {
             isDead = true;
         }
+    }
+
+    public void DestroyGameObjectDestroy()
+    {
+        Destroy(gameObject, 1f);
     }
 }

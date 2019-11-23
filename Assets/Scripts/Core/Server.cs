@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
+using UnityEngine.Playables;
 
 public class Server
 {
@@ -119,11 +120,25 @@ public class Server
         }
 
         bitBuffer.PutInt(enemies.Count, 0, 100);
-
+        
+        List<int> deadIds = new List<int>();
         foreach (var enemy in enemies.Values)
         {
+            if (enemy._enemyHealth.isDead)
+            {
+                deadIds.Add(enemy.id);
+            }
             enemy.GetEnemyState().Serialize(bitBuffer);
         }
+
+        foreach (var id in deadIds)
+        {
+            enemies[id]._enemyHealth.DestroyGameObjectDestroy ();
+            enemies.Remove(id);
+            
+        }
+        
+        
 
         var payload = bitBuffer.GetPayload();
 

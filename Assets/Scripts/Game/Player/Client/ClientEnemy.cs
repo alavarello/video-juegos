@@ -45,7 +45,7 @@ public class ClientEnemy : MonoBehaviour
             return;
 
         enemyAudio.Play();
-
+        Debug.Log(state.health);
         if(state.health <= 20)
         {
             isDead = true;
@@ -56,16 +56,8 @@ public class ClientEnemy : MonoBehaviour
 
             enemyAudio.clip = deathClip;
             enemyAudio.Play ();
-//            Client.enemies.Remove(state.id);
+            StartSinking();
         }
-    }
-    
-    public void StartSinking ()
-    {
-        GetComponent <UnityEngine.AI.NavMeshAgent> ().enabled = false;
-        GetComponent <Rigidbody> ().isKinematic = true;
-        isSinking = true;
-        Destroy (gameObject, 2f);
     }
 
     public ClientEnemy(EnemyState state)
@@ -76,7 +68,7 @@ public class ClientEnemy : MonoBehaviour
     private void UpdateMovement()
     {
         transform.position = new Vector3(state.x, state.y, state.z);
-        _enemyRigidBody.MoveRotation(Quaternion.Euler(state.xA, state.yA, state.zA));
+        transform.rotation = Quaternion.Euler(state.xA, state.yA, state.zA);
     }
     
     private void Update()
@@ -89,5 +81,13 @@ public class ClientEnemy : MonoBehaviour
         {
             UpdateMovement();
         }
+    }
+    
+    public void StartSinking ()
+    {
+        GetComponent <UnityEngine.AI.NavMeshAgent> ().enabled = false;
+        GetComponent <Rigidbody> ().isKinematic = true;
+        isSinking = true;
+        Destroy (gameObject, 2f);
     }
 }

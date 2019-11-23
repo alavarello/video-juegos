@@ -113,13 +113,16 @@ public class Interpolation
     {
         var fromEnemies = _fromSnapshot.enemies;
         var toEnemies = _toSnapshot.enemies;
-        var amountOfEnemies = Math.Min(fromEnemies.Count, toEnemies.Count);
-
+        var amountOfEnemies = fromEnemies.Count;
+        
         for(var i = 0; i < amountOfEnemies; i++)
         {
             EnemyState fromEnemy = fromEnemies[i];
-            EnemyState toEnemy = toEnemies[i];
-            
+            EnemyState toEnemy;
+            if (toEnemies.Count > i)
+                toEnemy = toEnemies[i];
+            else
+                toEnemy = fromEnemy;
             var fromVector = new Vector3(fromEnemy.x, fromEnemy.y, fromEnemy.z);
             var toVector = new Vector3(toEnemy.x, toEnemy.y, toEnemy.z);
             var n = (interpolationTime - _fromTime) / (_toTime - _fromTime);

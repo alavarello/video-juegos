@@ -7,7 +7,7 @@ public class EnemyManager : MonoBehaviour
     public Transform[] spawnPoints;
     public static int enemyIdCounter;
 
-    
+    public int maxForLevel = 20;
     // TODO ADD game over
     private bool gameOver = false; 
     void Start ()

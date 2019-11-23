@@ -10,13 +10,13 @@ public class EnemyMovement : MonoBehaviour
     List<Transform> players;
     EnemyHealth enemyHealth;
     UnityEngine.AI.NavMeshAgent nav;
-
+    public Rigidbody rigidbody;
 
     void Awake ()
     {
         enemyHealth = GetComponent <EnemyHealth> ();
         nav = GetComponent <UnityEngine.AI.NavMeshAgent> ();
-
+        rigidbody = GetComponent<Rigidbody>();
         players = engine.server.playersTransforms;
     }
     
@@ -34,6 +34,8 @@ public class EnemyMovement : MonoBehaviour
             nav.enabled = false;
         }
     }
+    
+   
 
     private Transform GetNearestTarget()
     {

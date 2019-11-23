@@ -9,8 +9,10 @@ public class Enemy
 
     public EnemyState GetEnemyState()
     {
-        var position = _enemyMovement.transform.position;
-        var rotation = _enemyMovement.transform.rotation;
+        var rigidBodyTransform = _enemyMovement.rigidbody.transform;
+        var position = rigidBodyTransform.position;
+        var rotation = rigidBodyTransform.rotation.eulerAngles;
+
         var health = _enemyHealth.currentHealth;
         return new EnemyState(id, position.x, position.y, position.z, rotation.x, rotation.y, rotation.z, health);
     }
@@ -19,4 +21,5 @@ public class Enemy
     {
         return GetEnemyState().ToString();
     }
+    
 }
