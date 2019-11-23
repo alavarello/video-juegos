@@ -7,6 +7,8 @@ public class ClientEnemy : MonoBehaviour
     
     public EnemyState state;
     private Rigidbody _enemyRigidBody;
+    public float sinkSpeed = 2.5f;
+
 
     private int startingHealth = 100;
     
@@ -44,7 +46,7 @@ public class ClientEnemy : MonoBehaviour
 
         enemyAudio.Play();
 
-        if(state.health <= 0)
+        if(state.health <= 20)
         {
             isDead = true;
 
@@ -54,8 +56,7 @@ public class ClientEnemy : MonoBehaviour
 
             enemyAudio.clip = deathClip;
             enemyAudio.Play ();
-            Client.enemies.Remove(state.id);
-            Destroy (gameObject, 2f);
+//            Client.enemies.Remove(state.id);
         }
     }
     
@@ -80,6 +81,13 @@ public class ClientEnemy : MonoBehaviour
     
     private void Update()
     {
-        UpdateMovement();
+        if(isSinking)
+        {
+            transform.Translate (Time.deltaTime * sinkSpeed * -Vector3.up);
+        }
+        else
+        {
+            UpdateMovement();
+        }
     }
 }
