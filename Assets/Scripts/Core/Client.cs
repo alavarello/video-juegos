@@ -17,7 +17,7 @@ public class Client
 
     public readonly Dictionary<int, ClientPlayer> players;
     
-    public Dictionary<int, ClientEnemy> enemies;
+    public static Dictionary<int, ClientEnemy> enemies;
     
     private Snapshot _snapshot;
 
@@ -294,14 +294,19 @@ public class Client
                 var enemyPrefab = Resources.Load<GameObject>("Prefabs/Client/ZomBunny");
                 var enemy = GameObject.Instantiate(enemyPrefab);  
                 var enemyScript = enemy.GetComponent<ClientEnemy>();
+                enemyScript.state = enemyState;
                 enemies.Add(enemyState.id, enemyScript);
             }
-            
-            enemies[enemyState.id].state = enemyState;
-
-            if (enemies[enemyState.id].state.health != enemyState.health)
+            else
             {
-                //simular disparo
+                var clientEnemy = enemies[enemyState.id];
+
+                if (clientEnemy.state.health != enemyState.health)
+                {
+                    clientEnemy.TakeDamage();
+                }
+
+                clientEnemy.state = enemyState;
             }
         }
     }
