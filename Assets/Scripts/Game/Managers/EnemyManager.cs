@@ -32,9 +32,9 @@ public class EnemyManager : MonoBehaviour
         var enemyScript = new Enemy();
 
         enemyScript.id = enemyIdCounter;
-        enemyScript._enemyAttack = enemy.GetComponent<EnemyAttack>();
         enemyScript._enemyMovement = enemy.GetComponent<EnemyMovement>();
         enemyScript._enemyHealth = enemy.GetComponent<EnemyHealth>();
+        enemyScript._enemyHealth.id = enemyIdCounter;
 
         Server.enemies[enemyIdCounter] = enemyScript;
 

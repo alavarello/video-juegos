@@ -2,6 +2,7 @@
 
 public class EnemyHealth : MonoBehaviour
 {
+    public int id;
     public int startingHealth = 100;
     public int currentHealth;
     public float sinkSpeed = 2.5f;
@@ -65,7 +66,8 @@ public class EnemyHealth : MonoBehaviour
         anim.SetTrigger ("Dead");
 
         enemyAudio.clip = deathClip;
-        enemyAudio.Play ();
+        enemyAudio.Play();
+        Server.enemies.Remove(id);
     }
 
 

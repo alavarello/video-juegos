@@ -4,7 +4,6 @@ public class Enemy
 {
     public int id;
     
-    public EnemyAttack _enemyAttack;
     public EnemyMovement _enemyMovement;
     public EnemyHealth _enemyHealth;
 

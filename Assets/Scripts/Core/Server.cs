@@ -150,6 +150,7 @@ public class Server
          }
          
          SendMessage();
+         Debug.Log(enemies.Count);
          
          _sequence++;
     }
