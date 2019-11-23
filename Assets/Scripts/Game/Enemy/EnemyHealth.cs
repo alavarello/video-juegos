@@ -14,7 +14,7 @@ public class EnemyHealth : MonoBehaviour
     AudioSource enemyAudio;
     ParticleSystem hitParticles;
     CapsuleCollider capsuleCollider;
-    bool isDead;
+    public bool isDead;
     bool isSinking;
 
 
@@ -43,8 +43,6 @@ public class EnemyHealth : MonoBehaviour
         if(isDead)
             return;
 
-        enemyAudio.Play ();
-
         currentHealth -= amount;
             
         hitParticles.transform.position = hitPoint;
@@ -52,31 +50,7 @@ public class EnemyHealth : MonoBehaviour
 
         if(currentHealth <= 0)
         {
-            Death ();
+            isDead = true;
         }
-    }
-
-
-    void Death ()
-    {
-        isDead = true;
-
-        capsuleCollider.isTrigger = true;
-
-        anim.SetTrigger ("Dead");
-
-        enemyAudio.clip = deathClip;
-        enemyAudio.Play();
-        Server.enemies.Remove(id);
-    }
-
-
-    public void StartSinking ()
-    {
-        GetComponent <UnityEngine.AI.NavMeshAgent> ().enabled = false;
-        GetComponent <Rigidbody> ().isKinematic = true;
-        isSinking = true;
-        Server.score += scoreValue;
-        Destroy (gameObject, 2f);
     }
 }

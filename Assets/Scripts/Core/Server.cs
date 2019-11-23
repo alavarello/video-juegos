@@ -150,7 +150,6 @@ public class Server
          }
          
          SendMessage();
-         Debug.Log(enemies.Count);
          
          _sequence++;
     }
@@ -163,6 +162,5 @@ public class Server
         playersHealth.Remove(playerHealth);
         playersTransforms.Remove(playersTransforms[index]);
         playersObjects.Remove(playersObjects[index]);
-        
     }
 }
