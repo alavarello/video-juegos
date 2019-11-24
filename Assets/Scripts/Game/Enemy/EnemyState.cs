@@ -36,9 +36,9 @@ public class EnemyState
     
     public void AddHitPoint(float xH, float yH, float zH)
     {
-        this.xH = x;
-        this.yH = y;
-        this.zH = z;
+        this.xH = xH;
+        this.yH = yH;
+        this.zH = zH;
         
     }
 
@@ -50,7 +50,7 @@ public class EnemyState
         z = bitBuffer.GetFloat(-100, 100, (float)0.1);
         
         yA = bitBuffer.GetInt(0, 360);
-        
+
         xH = bitBuffer.GetFloat(-100, 100, (float)0.1);
         yH = bitBuffer.GetFloat(-100, 100, (float)0.1);
         zH = bitBuffer.GetFloat(-100, 100, (float)0.1);
