@@ -123,7 +123,7 @@ public class Server
             playersValue.GetPlayerState().Serialize(bitBuffer);
         }
 
-        bitBuffer.PutInt(enemies.Count, 0, 100);
+        bitBuffer.PutInt(enemies.Count, 0, 1000);
         
         List<int> newDeadIds = new List<int>();
         foreach (var enemy in enemies.Values)

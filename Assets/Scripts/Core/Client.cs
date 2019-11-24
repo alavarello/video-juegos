@@ -241,7 +241,7 @@ public class Client
             playerStates.Add(new PlayerState(bitBuffer));
         }
 
-        var enemyCount = bitBuffer.GetInt(0, 100);
+        var enemyCount = bitBuffer.GetInt(0, 1000);
         for (var i = 0; i < enemyCount; i++)
         {
             enemyStates.Add(new EnemyState(bitBuffer));
