@@ -58,7 +58,7 @@ public class PlayerState
 
     public bool IsInTheSamePosition(PlayerState other)
     {   
-        if (Math.Abs(other.x - x) > 0.1 || Math.Abs(other.z - z) > 0.1) return false;
+        if (Math.Abs(other.x - x) > 1 || Math.Abs(other.z - z) > 1) return false;
         
         return true;
     }
