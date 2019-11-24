@@ -53,6 +53,8 @@ public class Client
 
     public ClientPlayer cameraPlayer;
 
+    private int level = 1;
+
     
     // Start is called before the first frame update
     public Client(Engine engine, ClientPlayer player)
@@ -220,7 +222,15 @@ public class Client
         
         var bitBuffer = new BitBuffer(message.message);
 
-        var score = bitBuffer.GetInt(0, 1000);
+        var score = bitBuffer.GetInt(0, 10000);
+        var level = bitBuffer.GetInt(0, 10);
+
+        if (level > this.level)
+        {
+            ClientLevelManager.LevelUp(level);
+            this.level = level;
+        }
+        
         var playerCount = bitBuffer.GetInt(0, 10);
 
         var playerStates = new List<PlayerState>();

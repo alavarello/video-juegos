@@ -8,7 +8,7 @@ public class LevelManager
 
     public static int enemiesSpawn = 1;
 
-    public static float levelRestartTime = 2f;
+    public static float levelRestartTime = 4f;
 
     public static float levelUpTime = 0;
     

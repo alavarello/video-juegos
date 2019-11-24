@@ -114,7 +114,8 @@ public class Server
     {
         BitBuffer bitBuffer = new BitBuffer();
          
-        bitBuffer.PutInt(score, 0, 1000);
+        bitBuffer.PutInt(score, 0, 10000);
+        bitBuffer.PutInt(LevelManager.level, 0, 10);
         bitBuffer.PutInt(_players.Count, 0, 10);
          
         foreach (var playersValue in _players.Values)
