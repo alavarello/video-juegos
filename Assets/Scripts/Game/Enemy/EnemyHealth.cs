@@ -36,9 +36,10 @@ public class EnemyHealth : MonoBehaviour
 
         this.hitPoint = hitPoint;
         currentHealth -= amount;
-        
+
         if(currentHealth <= 0)
         {
+            Server.score += scoreValue;
             isDead = true;
         }
     }

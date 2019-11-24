@@ -18,7 +18,7 @@ public class EnemyManager : MonoBehaviour
 
     void Spawn ()
     {
-        if(gameOver)
+        if(gameOver || enemyIdCounter > 3)
         {
             return;
         }
@@ -27,13 +27,13 @@ public class EnemyManager : MonoBehaviour
         var position = spawnPoints[spawnPointIndex].position;
         var rotations = spawnPoints[spawnPointIndex].rotation;
 
-        enemy = Instantiate (enemy, position, rotations);
+        var newEnemy = Instantiate (enemy, position, rotations);
         
         var enemyScript = new Enemy();
 
         enemyScript.id = enemyIdCounter;
-        enemyScript._enemyMovement = enemy.GetComponent<EnemyMovement>();
-        enemyScript._enemyHealth = enemy.GetComponent<EnemyHealth>();
+        enemyScript._enemyMovement = newEnemy.GetComponent<EnemyMovement>();
+        enemyScript._enemyHealth = newEnemy.GetComponent<EnemyHealth>();
         enemyScript._enemyHealth.id = enemyIdCounter;
 
         Server.enemies[enemyIdCounter] = enemyScript;
