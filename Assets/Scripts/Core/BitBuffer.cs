@@ -109,12 +109,12 @@ public class BitBuffer {
 	}
 	public BitBuffer()
 	{
-		_buffer = new byte[512];
+		_buffer = new byte[1024];
 	}
 
 	public BitBuffer(byte[] payload)
 	{
-		_buffer = new byte[512];
+		_buffer = new byte[1024];
 		for (int i=0; i < payload.Length; i++)
 		{
 			_buffer[i] = payload[i];

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -148,6 +148,7 @@ public class Server
         {
             Debug.Log("LevelUp");
             LevelManager.LevelUp();
+            enemies = new Dictionary<int, Enemy>();
         }
         
         var payload = bitBuffer.GetPayload();
