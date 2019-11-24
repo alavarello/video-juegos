@@ -17,6 +17,8 @@ public class Server
     
     public static Dictionary<int, Enemy> enemies;
     
+    public readonly List<int> deadIds = new List<int>();
+    
     private readonly Engine _engine;
 
     private int _sequence;
@@ -24,6 +26,7 @@ public class Server
     private float _timeForNextSnapshot;
 
     public static int score = 0;
+    
     
     private Dictionary<int, int> _lastMessageReceived = new Dictionary<int, int>();
     
@@ -121,25 +124,26 @@ public class Server
 
         bitBuffer.PutInt(enemies.Count, 0, 100);
         
-        List<int> deadIds = new List<int>();
+        List<int> newDeadIds = new List<int>();
         foreach (var enemy in enemies.Values)
         {
             if (enemy._enemyHealth.isDead)
             {
-                deadIds.Add(enemy.id);
+                newDeadIds.Add(enemy.id);
             }
             enemy.GetEnemyState().Serialize(bitBuffer);
         }
 
-        foreach (var id in deadIds)
+        foreach (var id in newDeadIds)
         {
+            if (deadIds.Contains(id))
+                continue;
             enemies[id]._enemyHealth.DestroyGameObjectDestroy ();
-            enemies.Remove(id);
-            
+            deadIds.Add(id);
         }
         
         
-
+        
         var payload = bitBuffer.GetPayload();
 
         foreach (var ipEndPoint in _ipEndPoints)

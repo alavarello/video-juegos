@@ -45,6 +45,6 @@ public class EnemyHealth : MonoBehaviour
 
     public void DestroyGameObjectDestroy()
     {
-        Destroy(gameObject, 1f);
+        Destroy(gameObject);
     }
 }
