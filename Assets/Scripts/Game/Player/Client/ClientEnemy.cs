@@ -42,27 +42,35 @@ public class ClientEnemy : MonoBehaviour
 
     }
     
-    public void TakeDamage (Vector3 hitPoint)
+    public void TakeDamage (Vector3 hitPoint, int newHealth)
     {
         if(isDead)
             return;
         
         enemyAudio.Play();
-        hitParticles.transform.position = hitPoint;
-        hitParticles.Play();
-        
-        if(state.health <= 20)
+        if (hitPoint != Vector3.zero)
         {
-            isDead = true;
-
-            capsuleCollider.isTrigger = true;
-
-            _anim.SetTrigger("Dead");
-
-            enemyAudio.clip = deathClip;
-            enemyAudio.Play ();
-            StartSinking();
+            hitParticles.transform.position = hitPoint;
+            hitParticles.Play();
+            
         }
+        if (newHealth <= 0)
+        {
+            Kill();
+        }
+    }
+
+    public void Kill()
+    {
+        isDead = true;
+
+        capsuleCollider.isTrigger = true;
+
+        _anim.SetTrigger("Dead");
+
+        enemyAudio.clip = deathClip;
+        enemyAudio.Play ();
+        StartSinking();
     }
 
     public ClientEnemy(EnemyState state)
