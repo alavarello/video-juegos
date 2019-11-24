@@ -35,7 +35,7 @@ public class ClientEnemy : MonoBehaviour
         state = new EnemyState( 
             position.x, position.y, position.z,
             rotation.x, rotation.y, rotation.z,
-            startingHealth
+            startingHealth, EnemyType.Default
         );
         // -----------        -----------
         hitParticles = GetComponentInChildren <ParticleSystem> ();

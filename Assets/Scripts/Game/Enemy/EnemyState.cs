@@ -4,14 +4,16 @@ using UnityEngine;
 
 public class EnemyState
 {
+    public EnemyType type;
     public int health;
     public int id;
     public float x, y, z;
     public float xA, yA, zA;
     // Hit particles
     public float xH, yH, zH;
+    
 
-    public EnemyState(int id, float x, float y, float z, float xA, float yA, float zA, int health)
+    public EnemyState(int id, float x, float y, float z, float xA, float yA, float zA, int health, EnemyType type)
     {
         this.id = id;
         this.health = health;
@@ -21,9 +23,10 @@ public class EnemyState
         this.xA = xA;
         this.yA = yA;
         this.zA = zA;
+        this.type = type;
     }
     
-    public EnemyState(float x, float y, float z, float xA, float yA, float zA, int health)
+    public EnemyState(float x, float y, float z, float xA, float yA, float zA, int health, EnemyType type)
     {
         this.health = health;
         this.x = x;
@@ -32,6 +35,7 @@ public class EnemyState
         this.xA = xA;
         this.yA = yA;
         this.zA = zA;
+        this.type = type;
     }
     
     public void AddHitPoint(float xH, float yH, float zH)
@@ -45,6 +49,8 @@ public class EnemyState
     public EnemyState(BitBuffer bitBuffer)
     {
         id = bitBuffer.GetInt(0, 100);
+
+        type = (EnemyType)bitBuffer.GetInt(0, 3);
 
         x = bitBuffer.GetFloat(-100, 100, (float)0.1);
         z = bitBuffer.GetFloat(-100, 100, (float)0.1);
@@ -61,7 +67,8 @@ public class EnemyState
     public void Serialize(BitBuffer bitBuffer)
     {
         bitBuffer.PutInt(id, 0, 100);
-
+        
+        bitBuffer.PutInt((int)type, 0, 3);
         bitBuffer.PutFloat(x, -100, 100, (float)0.1);
         bitBuffer.PutFloat(z, -100, 100, (float)0.1);
         

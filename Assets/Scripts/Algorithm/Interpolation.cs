@@ -135,7 +135,7 @@ public class Interpolation
             var state = new EnemyState(fromEnemy.id,
                 vector.x, vector.y, vector.z,  
                 rotation.x, rotation.y, rotation.z,
-                fromEnemy.health
+                fromEnemy.health, fromEnemy.type
             );
             state.AddHitPoint(fromEnemy.xH, fromEnemy.yH, fromEnemy.zH);
             

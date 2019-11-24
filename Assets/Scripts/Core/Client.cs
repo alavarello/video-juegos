@@ -290,7 +290,20 @@ public class Client
         {
             if(!enemies.ContainsKey(enemyState.id))
             {
-                var enemyPrefab = Resources.Load<GameObject>("Prefabs/Client/ZomBunny");
+                GameObject enemyPrefab = null;
+                switch (enemyState.type)
+                {
+                    case EnemyType.ZomBunny:
+                        enemyPrefab = Resources.Load<GameObject>("Prefabs/Client/ZomBunny");
+                        break;
+                    case EnemyType.ZomBear:
+                        enemyPrefab = Resources.Load<GameObject>("Prefabs/Client/ZomBear");
+                        break;
+                    case EnemyType.Hellephants:
+                        enemyPrefab = Resources.Load<GameObject>("Prefabs/Client/Hellephants");
+                        break;
+
+                }
                 var enemy = GameObject.Instantiate(enemyPrefab);  
                 var enemyScript = enemy.GetComponent<ClientEnemy>();
                 enemyScript.state = enemyState;

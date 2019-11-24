@@ -3,6 +3,7 @@
 public class EnemyManager : MonoBehaviour
 {
     public GameObject enemy;
+    public EnemyType type;
     public float spawnTime = 3f;
     public Transform[] spawnPoints;
     public static int enemyIdCounter;
@@ -32,6 +33,7 @@ public class EnemyManager : MonoBehaviour
         var enemyScript = new Enemy();
 
         enemyScript.id = enemyIdCounter;
+        enemyScript.type = type;
         enemyScript._enemyMovement = newEnemy.GetComponent<EnemyMovement>();
         enemyScript._enemyHealth = newEnemy.GetComponent<EnemyHealth>();
         enemyScript._enemyHealth.id = enemyIdCounter;
