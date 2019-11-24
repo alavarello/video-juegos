@@ -19,7 +19,7 @@ public class EnemyManager : MonoBehaviour
 
     void Spawn ()
     {
-        if(gameOver || LevelManager.CanSpawn())
+        if(gameOver || !LevelManager.CanSpawn())
         {
             return;
         }
@@ -36,10 +36,16 @@ public class EnemyManager : MonoBehaviour
         enemyScript.type = type;
         enemyScript._enemyMovement = newEnemy.GetComponent<EnemyMovement>();
         enemyScript._enemyHealth = newEnemy.GetComponent<EnemyHealth>();
+        if (type == EnemyType.Hellephants)
+        {
+            enemyScript._enemyHealth.currentHealth = 200;
+            enemyScript._enemyHealth.scoreValue = 20;
+        }
         enemyScript._enemyHealth.id = enemyIdCounter;
 
         Server.enemies[enemyIdCounter] = enemyScript;
 
         enemyIdCounter++;
+        LevelManager.enemiesSpawn++;
     }
 }

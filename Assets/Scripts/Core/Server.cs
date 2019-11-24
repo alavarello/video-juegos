@@ -143,7 +143,7 @@ public class Server
         }
         
         // All the zombies are dead
-        if (enemies.Count == deadIds.Count)
+        if (deadIds.Count == LevelManager.totalEnemies)
         {
             Debug.Log("LevelUp");
             LevelManager.LevelUp();
