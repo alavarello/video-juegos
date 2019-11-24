@@ -14,7 +14,10 @@ public class Enemy
         var rotation = rigidBodyTransform.rotation.eulerAngles;
 
         var health = _enemyHealth.currentHealth;
-        return new EnemyState(id, position.x, position.y, position.z, rotation.x, rotation.y, rotation.z, health);
+        var enemyState =  new EnemyState(id, position.x, position.y, position.z, rotation.x, rotation.y, rotation.z, health);
+        var hitPoint = _enemyHealth.hitPoint;
+        enemyState.AddHitPoint(hitPoint.x, hitPoint.y, hitPoint.z);
+        return enemyState;
     }
 
     public override string ToString()

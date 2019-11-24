@@ -302,7 +302,8 @@ public class Client
 
                 if (clientEnemy.state.health != enemyState.health)
                 {
-                    clientEnemy.TakeDamage();
+                    var state = clientEnemy.state;
+                    clientEnemy.TakeDamage(new Vector3(state.xH, state.yH, state.zH));
                 }
 
                 clientEnemy.state = enemyState;

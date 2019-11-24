@@ -16,6 +16,7 @@ public class EnemyHealth : MonoBehaviour
     CapsuleCollider capsuleCollider;
     public bool isDead;
 
+    public Vector3 hitPoint;
 
     void Awake ()
     {
@@ -33,9 +34,9 @@ public class EnemyHealth : MonoBehaviour
         if(isDead)
             return;
 
+        this.hitPoint = hitPoint;
         currentHealth -= amount;
-        hitParticles.transform.position = hitPoint;
-        hitParticles.Play();
+        
         if(currentHealth <= 0)
         {
             isDead = true;

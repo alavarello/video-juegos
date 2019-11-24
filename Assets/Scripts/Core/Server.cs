@@ -19,9 +19,9 @@ public class Server
     
     private readonly Engine _engine;
 
-    private int _sequence = 0;
+    private int _sequence;
 
-    private float _timeForNextSnapshot = 0;
+    private float _timeForNextSnapshot;
 
     public static int score = 0;
     

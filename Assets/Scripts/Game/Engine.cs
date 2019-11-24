@@ -37,6 +37,8 @@ public class Engine: MonoBehaviour
 
         if(isClient)
         {
+            EnemyMovement.engine = this;
+            EnemyAttack.engine = this;
             ClientPlayer.playerId = playerId;
             client = new Client(this, FindObjectOfType<ClientPlayer>());
             ClientPlayer.client = client;

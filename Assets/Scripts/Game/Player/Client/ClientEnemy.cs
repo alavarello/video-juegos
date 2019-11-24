@@ -9,6 +9,7 @@ public class ClientEnemy : MonoBehaviour
     private Rigidbody _enemyRigidBody;
     public float sinkSpeed = 2.5f;
 
+    ParticleSystem hitParticles;
 
     private int startingHealth = 100;
     
@@ -37,16 +38,20 @@ public class ClientEnemy : MonoBehaviour
             startingHealth
         );
         // -----------        -----------
+        hitParticles = GetComponentInChildren <ParticleSystem> ();
+
     }
     
-    public void TakeDamage ()
+    public void TakeDamage (Vector3 hitPoint)
     {
         if(isDead)
             return;
-
+        
         enemyAudio.Play();
-        Debug.Log(state.health);
-        if(state.health <= 20)
+        hitParticles.transform.position = hitPoint;
+        hitParticles.Play();
+        
+        if(state.health <= 0)
         {
             isDead = true;
 
