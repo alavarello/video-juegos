@@ -48,7 +48,7 @@ public class EnemyState
 
     public EnemyState(BitBuffer bitBuffer)
     {
-        id = bitBuffer.GetInt(0, 100);
+        id = bitBuffer.GetInt(0, 1000);
 
         type = (EnemyType)bitBuffer.GetInt(0, 3);
 
@@ -61,12 +61,12 @@ public class EnemyState
         yH = bitBuffer.GetFloat(-200, 200, (float)0.1);
         zH = bitBuffer.GetFloat(-200, 200, (float)0.1);
 
-        health = bitBuffer.GetInt(0, 100);
+        health = bitBuffer.GetInt(0, 200);
     }
 
     public void Serialize(BitBuffer bitBuffer)
     {
-        bitBuffer.PutInt(id, 0, 100);
+        bitBuffer.PutInt(id, 0, 1000);
         
         bitBuffer.PutInt((int)type, 0, 3);
         bitBuffer.PutFloat(x, -200, 200, (float)0.1);
@@ -78,7 +78,7 @@ public class EnemyState
         bitBuffer.PutFloat(yH, -200, 200, (float)0.1);
         bitBuffer.PutFloat(zH, -200, 200, (float)0.1);
         
-        bitBuffer.PutInt(health, 0, 100);
+        bitBuffer.PutInt(health, 0, 200);
     }
 
     public override string ToString()
