@@ -142,7 +142,12 @@ public class Server
             deadIds.Add(id);
         }
         
-        
+        // All the zombies are dead
+        if (enemies.Count == deadIds.Count)
+        {
+            Debug.Log("LevelUp");
+            LevelManager.LevelUp();
+        }
         
         var payload = bitBuffer.GetPayload();
 
