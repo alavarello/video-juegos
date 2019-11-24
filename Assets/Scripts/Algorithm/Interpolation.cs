@@ -137,6 +137,7 @@ public class Interpolation
                 rotation.x, rotation.y, rotation.z,
                 fromEnemy.health
             );
+            state.AddHitPoint(fromEnemy.xH, fromEnemy.yH, fromEnemy.zH);
             
             interpolatedSnapshot.enemies.Add(state);
         }

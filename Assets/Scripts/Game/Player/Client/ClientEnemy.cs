@@ -51,7 +51,7 @@ public class ClientEnemy : MonoBehaviour
         hitParticles.transform.position = hitPoint;
         hitParticles.Play();
         
-        if(state.health <= 0)
+        if(state.health <= 20)
         {
             isDead = true;
 
