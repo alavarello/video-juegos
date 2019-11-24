@@ -300,7 +300,7 @@ public class Client
                         enemyPrefab = Resources.Load<GameObject>("Prefabs/Client/ZomBear");
                         break;
                     case EnemyType.Hellephants:
-                        enemyPrefab = Resources.Load<GameObject>("Prefabs/Client/Hellephants");
+                        enemyPrefab = Resources.Load<GameObject>("Prefabs/Client/Hellephant");
                         break;
 
                 }
