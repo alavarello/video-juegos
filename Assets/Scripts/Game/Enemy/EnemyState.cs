@@ -52,14 +52,14 @@ public class EnemyState
 
         type = (EnemyType)bitBuffer.GetInt(0, 3);
 
-        x = bitBuffer.GetFloat(-100, 100, (float)0.1);
-        z = bitBuffer.GetFloat(-100, 100, (float)0.1);
+        x = bitBuffer.GetFloat(-200, 200, (float)0.1);
+        z = bitBuffer.GetFloat(-200, 200, (float)0.1);
         
         yA = bitBuffer.GetInt(0, 360);
 
-        xH = bitBuffer.GetFloat(-100, 100, (float)0.1);
-        yH = bitBuffer.GetFloat(-100, 100, (float)0.1);
-        zH = bitBuffer.GetFloat(-100, 100, (float)0.1);
+        xH = bitBuffer.GetFloat(-200, 200, (float)0.1);
+        yH = bitBuffer.GetFloat(-200, 200, (float)0.1);
+        zH = bitBuffer.GetFloat(-200, 200, (float)0.1);
 
         health = bitBuffer.GetInt(0, 100);
     }
@@ -69,14 +69,14 @@ public class EnemyState
         bitBuffer.PutInt(id, 0, 100);
         
         bitBuffer.PutInt((int)type, 0, 3);
-        bitBuffer.PutFloat(x, -100, 100, (float)0.1);
-        bitBuffer.PutFloat(z, -100, 100, (float)0.1);
+        bitBuffer.PutFloat(x, -200, 200, (float)0.1);
+        bitBuffer.PutFloat(z, -200, 200, (float)0.1);
         
         bitBuffer.PutInt((int) yA, 0, 360);
         
-        bitBuffer.PutFloat(xH, -100, 100, (float)0.1);
-        bitBuffer.PutFloat(yH, -100, 100, (float)0.1);
-        bitBuffer.PutFloat(zH, -100, 100, (float)0.1);
+        bitBuffer.PutFloat(xH, -200, 200, (float)0.1);
+        bitBuffer.PutFloat(yH, -200, 200, (float)0.1);
+        bitBuffer.PutFloat(zH, -200, 200, (float)0.1);
         
         bitBuffer.PutInt(health, 0, 100);
     }
