@@ -8,9 +8,7 @@ public class Engine: MonoBehaviour
     public int serverListeningPort;
     
     public int clientListeningPort;
-
-    public List<string> IPs = new List<string>();
-
+    
     public string serverIp;
     
     public bool isServer;

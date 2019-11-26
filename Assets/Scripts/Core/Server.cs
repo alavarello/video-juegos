@@ -27,6 +27,8 @@ public class Server
 
     public static int score = 0;
     
+    private int idCounter = 0;
+
     
     private Dictionary<int, int> _lastMessageReceived = new Dictionary<int, int>();
     
@@ -35,33 +37,19 @@ public class Server
     public readonly List<PlayerHealth> playersHealth = new List<PlayerHealth>();
     public readonly List<GameObject> playersObjects = new List<GameObject>();
 
+    
     // Start is called before the first frame update
     public Server(Engine engine)
     {
         _engine = engine;
-        foreach (var ip in engine.IPs)
-        {
-            _ipEndPoints.Add(new IPEndPoint(IPAddress.Parse(ip), engine.clientListeningPort));
-        }
+        _ipEndPoints = new List<IPEndPoint>();
+
         
         _packetProcessor = new PacketProcessor(null, engine.serverListeningPort, true);
         
-        var idCounter = 0;
         _players = new Dictionary<int, Player>();
         enemies = new Dictionary<int, Enemy>();
         
-        foreach (var ips in engine.IPs)
-        {
-            var id = idCounter++;
-            var playerScript = CreatePlayer();
-            playerScript.id = id;
-            playerScript.playerHealth = playerScript.GetComponent<PlayerHealth>();
-            playerScript.playerMovement = playerScript.GetComponent<PlayerMovement>();
-            _players.Add(id, playerScript);
-            playersTransforms.Add(playerScript.playerMovement.transform);
-            playersHealth.Add(playerScript.playerHealth);
-            playersObjects.Add(playerScript.gameObject);
-        }
         
     }
 
@@ -75,6 +63,30 @@ public class Server
 
     private void ReadMessage(Message message)
     {
+        
+        
+        if (message.messageType == MessageType.Join)
+        {
+            var idPlayer = idCounter++;
+
+            var playerScript = CreatePlayer();
+            playerScript.id = idPlayer;
+            playerScript.playerHealth = playerScript.GetComponent<PlayerHealth>();
+            playerScript.playerMovement = playerScript.GetComponent<PlayerMovement>();
+            _players.Add(idPlayer, playerScript);
+            playersTransforms.Add(playerScript.playerMovement.transform);
+            playersHealth.Add(playerScript.playerHealth);
+            playersObjects.Add(playerScript.gameObject);
+
+            _ipEndPoints.Add(message.from);
+
+            BitBuffer buffer = new BitBuffer();
+            buffer.PutInt(idPlayer, 0, 10);
+
+            _packetProcessor.SendReliableFastData(buffer.GetPayload(), message.from, MessageType.JoinACK, _sequence);
+            return;
+        }
+        
         BitBuffer bitBuffer = new BitBuffer(message.message);
 
         var id = bitBuffer.GetInt(0, 10);
@@ -146,7 +158,6 @@ public class Server
         // All the zombies are dead
         if (deadIds.Count == LevelManager.totalEnemies)
         {
-            Debug.Log("LevelUp");
             LevelManager.LevelUp();
             enemies = new Dictionary<int, Enemy>();
         }

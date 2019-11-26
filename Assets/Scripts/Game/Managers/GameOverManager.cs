@@ -26,7 +26,5 @@ public class GameOverManager : MonoBehaviour
  
         // ... tell the animator the game is over.
         anim.SetTrigger ("GameOver");
-        Debug.Log("LLEGUEEEEEEEEEEEEE");
-
     }
 }

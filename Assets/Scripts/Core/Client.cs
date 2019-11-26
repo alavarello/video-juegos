@@ -70,7 +70,7 @@ public class Client
         _floorMask = LayerMask.GetMask ("Floor");
         _healthSlider = GameObject.FindGameObjectsWithTag("Health")[0].GetComponent<Slider>();
         _damageImage = GameObject.FindGameObjectsWithTag("DamageImage")[0].GetComponent<Image>();
-    }
+        _packetProcessor.SendReliableFastData(null, _serverIpEndPoint, MessageType.Join, _sequence);}
 
     public void Update()
     {
@@ -218,9 +218,18 @@ public class Client
 
     private void SaveMessage(Message message)
     {
-        if (message == null) return;
+        if (message == null || message.message == null) return;
         
         var bitBuffer = new BitBuffer(message.message);
+        
+        if (message.messageType == MessageType.JoinACK)
+        {
+            var playerId = bitBuffer.GetInt(0, 10);
+            _engine.playerId = playerId;
+            ClientPlayer.playerId = playerId;
+            return;
+        }
+
 
         var score = bitBuffer.GetInt(0, 10000);
         var level = bitBuffer.GetInt(0, 10);
