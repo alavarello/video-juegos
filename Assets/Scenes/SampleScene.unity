@@ -809,8 +809,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   serverListeningPort: 9090
   clientListeningPort: 9091
-  IPs:
-  - 127.0.0.1
   serverIp: 127.0.0.1
   isServer: 1
   isClient: 1
