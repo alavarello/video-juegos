@@ -159,4 +159,9 @@ public class ClientPlayer : MonoBehaviour
             currentHealth, _playerShootingClient.isShooting
         );
     }
+
+    public void RestartLevel()
+    {
+        
+    }
 }
