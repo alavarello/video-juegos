@@ -66,19 +66,19 @@ public class EnemyState
 
     public void Serialize(BitBuffer bitBuffer)
     {
-        bitBuffer.PutInt(id, 0, 1000);
+        bitBuffer.InsertInt(id, 0, 1000);
         
-        bitBuffer.PutInt((int)type, 0, 3);
+        bitBuffer.InsertInt((int)type, 0, 3);
         bitBuffer.PutFloat(x, -200, 200, (float)0.1);
         bitBuffer.PutFloat(z, -200, 200, (float)0.1);
         
-        bitBuffer.PutInt((int) yA, 0, 360);
+        bitBuffer.InsertInt((int) yA, 0, 360);
         
         bitBuffer.PutFloat(xH, -200, 200, (float)0.1);
         bitBuffer.PutFloat(yH, -200, 200, (float)0.1);
         bitBuffer.PutFloat(zH, -200, 200, (float)0.1);
         
-        bitBuffer.PutInt(health, 0, 200);
+        bitBuffer.InsertInt(health, 0, 200);
     }
 
     public override string ToString()

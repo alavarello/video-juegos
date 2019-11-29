@@ -95,18 +95,18 @@ public class PlayerState
     
     public void Serialize(BitBuffer bitBuffer)
     {
-        bitBuffer.PutInt(id, 0, 10);
+        bitBuffer.InsertInt(id, 0, 10);
        
         bitBuffer.PutFloat(x, -100, 100, (float)0.1);
         bitBuffer.PutFloat(z, -100, 100, (float)0.1);
 
-        bitBuffer.PutInt((int) xA, 0, 360);
-        bitBuffer.PutInt((int) yA, 0, 360);
-        bitBuffer.PutInt((int) zA, 0, 360);
+        bitBuffer.InsertInt((int) xA, 0, 360);
+        bitBuffer.InsertInt((int) yA, 0, 360);
+        bitBuffer.InsertInt((int) zA, 0, 360);
         
-        bitBuffer.PutInt(health, 0, 100);
-        bitBuffer.PutBit(isShooting);
+        bitBuffer.InsertInt(health, 0, 100);
+        bitBuffer.InsertBit(isShooting);
         
-        bitBuffer.PutInt(sequence, 0, 10000);
+        bitBuffer.InsertInt(sequence, 0, 10000);
     }
 }

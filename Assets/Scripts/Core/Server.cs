@@ -81,9 +81,9 @@ public class Server
             _ipEndPoints.Add(message.from);
 
             BitBuffer buffer = new BitBuffer();
-            buffer.PutInt(idPlayer, 0, 10);
+            buffer.InsertInt(idPlayer, 0, 10);
 
-            _packetProcessor.SendReliableFastData(buffer.GetPayload(), message.from, MessageType.JoinACK, _sequence);
+            _packetProcessor.SendReliableFastData(buffer.GetByteArray(), message.from, MessageType.JoinACK, _sequence);
             return;
         }
         
@@ -126,16 +126,16 @@ public class Server
     {
         BitBuffer bitBuffer = new BitBuffer();
          
-        bitBuffer.PutInt(score, 0, 10000);
-        bitBuffer.PutInt(LevelManager.level, 0, 10);
-        bitBuffer.PutInt(_players.Count, 0, 10);
+        bitBuffer.InsertInt(score, 0, 10000);
+        bitBuffer.InsertInt(LevelManager.level, 0, 10);
+        bitBuffer.InsertInt(_players.Count, 0, 10);
          
         foreach (var playersValue in _players.Values)
         {
             playersValue.GetPlayerState().Serialize(bitBuffer);
         }
 
-        bitBuffer.PutInt(enemies.Count, 0, 1000);
+        bitBuffer.InsertInt(enemies.Count, 0, 1000);
         
         List<int> newDeadIds = new List<int>();
         foreach (var enemy in enemies.Values)
@@ -162,7 +162,7 @@ public class Server
             enemies = new Dictionary<int, Enemy>();
         }
         
-        var payload = bitBuffer.GetPayload();
+        var payload = bitBuffer.GetByteArray();
 
         foreach (var ipEndPoint in _ipEndPoints)
         {

@@ -132,18 +132,18 @@ public class Client
         BitBuffer bitBuffer = new BitBuffer();
         
         //TODO: cambiar rango de player id
-        bitBuffer.PutInt(_engine.playerId, 0, 10);
+        bitBuffer.InsertInt(_engine.playerId, 0, 10);
         
-        bitBuffer.PutInt((int)angles.x, 0, 360);
-        bitBuffer.PutInt((int)angles.y, 0, 360);
-        bitBuffer.PutInt((int)angles.z, 0, 360);
+        bitBuffer.InsertInt((int)angles.x, 0, 360);
+        bitBuffer.InsertInt((int)angles.y, 0, 360);
+        bitBuffer.InsertInt((int)angles.z, 0, 360);
         
-        bitBuffer.PutInt((int)move.x, -1, 1);
-        bitBuffer.PutInt((int)move.y, -1, 1);
+        bitBuffer.InsertInt((int)move.x, -1, 1);
+        bitBuffer.InsertInt((int)move.y, -1, 1);
         
-        bitBuffer.PutBit(shoot);
+        bitBuffer.InsertBit(shoot);
         
-        _packetProcessor.SendReliableFastData(bitBuffer.GetPayload(), _serverIpEndPoint, MessageType.Input, _sequence);
+        _packetProcessor.SendReliableFastData(bitBuffer.GetByteArray(), _serverIpEndPoint, MessageType.Input, _sequence);
     }
 
     private Vector3 GetRotation()
