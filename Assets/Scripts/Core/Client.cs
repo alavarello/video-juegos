@@ -17,6 +17,8 @@ public class Client
 
     public readonly Dictionary<int, ClientPlayer> players;
     
+    public static Dictionary<int, ClientEnemy> enemies;
+    
     private Snapshot _snapshot;
 
     private int _sequence = -1;
@@ -51,6 +53,8 @@ public class Client
 
     public ClientPlayer cameraPlayer;
 
+    private int level = 1;
+
     
     // Start is called before the first frame update
     public Client(Engine engine, ClientPlayer player)
@@ -59,14 +63,50 @@ public class Client
         _serverIpEndPoint = new IPEndPoint(IPAddress.Parse(engine.serverIp), engine.serverListeningPort);
         _packetProcessor = new PacketProcessor(null, engine.clientListeningPort, true);
         players = new Dictionary<int, ClientPlayer>();
+        enemies = new Dictionary<int, ClientEnemy>();
         _interpolation = new Interpolation(engine);
         _prediction = new Prediction(player, _engine.playerId);
         _player = player;
         _floorMask = LayerMask.GetMask ("Floor");
         _healthSlider = GameObject.FindGameObjectsWithTag("Health")[0].GetComponent<Slider>();
         _damageImage = GameObject.FindGameObjectsWithTag("DamageImage")[0].GetComponent<Image>();
-    }
+        _packetProcessor.SendReliableFastData(null, _serverIpEndPoint, MessageType.Join, _sequence);}
 
+    public void Update()
+    {
+        if (_sequence != -1)
+        {
+            UpdateStates();
+
+            _sequence++;
+
+            _timer += Time.deltaTime;
+            if (!_player.isDead)
+            {
+                SendInput();
+
+                // Prediction
+                _player.UpdateHealth();
+                _player.UpdateState();
+                _player.Animating();
+                _player.state.sequence = _sequence;
+                _prediction.AddState(_player.state);
+            }
+        }
+
+        var messages = _packetProcessor.GetData();
+        while (messages != null)
+        {
+            if (_sequence == -1)
+                _sequence = 1;
+                    
+            foreach (var message in messages)
+                SaveMessage(message);
+
+            messages = _packetProcessor.GetData();
+        }
+    }
+    
     public void ChangeCamera()
     {
         var i = 0;
@@ -82,57 +122,6 @@ public class Client
         }
     }
 
-    // Update is called once per frame
-    
-    public void Update()
-    {
-//        if (Time.unscaledTime < _timeForNextSnapshot) return;
-//        
-//        _timeForNextSnapshot = Time.unscaledTime +  1f / _engine.clientFps;
-        
-        if (_sequence != -1)
-        {
-            UpdateStates();
-            
-            _sequence++;
-
-//                Debug.Log("Client : "+ (_sequence/ (float) _engine.clientFps));
-            
-            _timer += Time.deltaTime;
-            if (!_player.isDead)
-            {
-                SendInput();
-                
-                // Prediction
-                _player.UpdateHealth();
-                _player.UpdateState();
-                _player.Animating();
-                _player.state.sequence = _sequence;
-                _prediction.AddState(_player.state);
-            }
-                
-            
-        }
-        var messages = _packetProcessor.GetData();
-        while (messages != null)
-        {
-            Debug.Log(messages[0].sequence);
-            if (_sequence == -1)
-            {
-                var time = messages[0].sequence * (1.0f / _engine.serverSps);
-                _sequence = 1;
-            }
-
-            foreach (var message in messages)
-            {
-                SaveMessage(message);
-            }
-
-            messages = _packetProcessor.GetData();
-        }
-
-    }
-
     private void SendInput()
     {
         var angles = GetRotation();
@@ -143,18 +132,18 @@ public class Client
         BitBuffer bitBuffer = new BitBuffer();
         
         //TODO: cambiar rango de player id
-        bitBuffer.PutInt(_engine.playerId, 0, 10);
+        bitBuffer.InsertInt(_engine.playerId, 0, 10);
         
-        bitBuffer.PutInt((int)angles.x, 0, 360);
-        bitBuffer.PutInt((int)angles.y, 0, 360);
-        bitBuffer.PutInt((int)angles.z, 0, 360);
+        bitBuffer.InsertInt((int)angles.x, 0, 360);
+        bitBuffer.InsertInt((int)angles.y, 0, 360);
+        bitBuffer.InsertInt((int)angles.z, 0, 360);
         
-        bitBuffer.PutInt((int)move.x, -1, 1);
-        bitBuffer.PutInt((int)move.y, -1, 1);
+        bitBuffer.InsertInt((int)move.x, -1, 1);
+        bitBuffer.InsertInt((int)move.y, -1, 1);
         
-        bitBuffer.PutBit(shoot);
+        bitBuffer.InsertBit(shoot);
         
-        _packetProcessor.SendReliableFastData(bitBuffer.GetPayload(), _serverIpEndPoint, MessageType.Input, _sequence);
+        _packetProcessor.SendReliableFastData(bitBuffer.GetByteArray(), _serverIpEndPoint, MessageType.Input, _sequence);
     }
 
     private Vector3 GetRotation()
@@ -229,36 +218,54 @@ public class Client
 
     private void SaveMessage(Message message)
     {
-        if (message != null)
-        {
-            var bitBuffer = new BitBuffer(message.message);
-
-            var score = bitBuffer.GetInt(0, 100);
-
-            var playerStates = new List<PlayerState>();
-
-            while (bitBuffer._seek < bitBuffer._length)
-            {
-                playerStates.Add(new PlayerState(bitBuffer));
-            }
+        if (message == null || message.message == null) return;
         
-            _snapshot = new Snapshot(playerStates, message.sequence);
-            _snapshot.score = score;
-//            Debug.Log("SERVER MESSAGE: " + score);
-            _interpolation.AddSnapshot(_snapshot);
-            
-            _prediction.checkState(_snapshot);
+        var bitBuffer = new BitBuffer(message.message);
+        
+        if (message.messageType == MessageType.JoinACK)
+        {
+            var playerId = bitBuffer.GetInt(0, 10);
+            _engine.playerId = playerId;
+            ClientPlayer.playerId = playerId;
+            return;
         }
+
+
+        var score = bitBuffer.GetInt(0, 10000);
+        var level = bitBuffer.GetInt(0, 10);
+
+        if (level > this.level)
+        {
+            ClientLevelManager.LevelUp(level);
+            this.level = level;
+        }
+        
+        var playerCount = bitBuffer.GetInt(0, 10);
+
+        var playerStates = new List<PlayerState>();
+        var enemyStates = new List<EnemyState>();
+
+        for (var i = 0; i < playerCount; i++)
+        {
+            playerStates.Add(new PlayerState(bitBuffer));
+        }
+
+        var enemyCount = bitBuffer.GetInt(0, 1000);
+        for (var i = 0; i < enemyCount; i++)
+        {
+            enemyStates.Add(new EnemyState(bitBuffer));
+        }
+        
+        _snapshot = new Snapshot(playerStates, enemyStates, message.sequence);
+        _snapshot.score = score;
+            
+        _interpolation.AddSnapshot(_snapshot);
+            
+        _prediction.checkState(_snapshot);
     }
 
-    private bool UpdateStates()
+    private void UpdatePlayers(Snapshot interpolatedSnapshot)
     {
-        var interpolatedSnapshot = _interpolation.Interpolate(_sequence);
-        if (interpolatedSnapshot == null)
-        {
-            return false;
-        }
-
         foreach (var playerState in interpolatedSnapshot.players)
         {
             if(!players.ContainsKey(playerState.Id))
@@ -294,7 +301,53 @@ public class Client
 
             players[playerState.Id].SetPlayerState(playerState); 
         }
+    }
+    
+    private void UpdateEnemies(Snapshot interpolatedSnapshot)
+    {
+        foreach (var enemyState in interpolatedSnapshot.enemies)
+        {
+            if(!enemies.ContainsKey(enemyState.id))
+            {
+                GameObject enemyPrefab = null;
+                switch (enemyState.type)
+                {
+                    case EnemyType.ZomBunny:
+                        enemyPrefab = Resources.Load<GameObject>("Prefabs/Client/ZomBunny");
+                        break;
+                    case EnemyType.ZomBear:
+                        enemyPrefab = Resources.Load<GameObject>("Prefabs/Client/ZomBear");
+                        break;
+                    case EnemyType.Hellephants:
+                        enemyPrefab = Resources.Load<GameObject>("Prefabs/Client/Hellephant");
+                        break;
 
-        return true;
+                }
+                var enemy = GameObject.Instantiate(enemyPrefab);  
+                var enemyScript = enemy.GetComponent<ClientEnemy>();
+                enemyScript.state = enemyState;
+                enemyScript.transform.position = new Vector3(enemyState.x, 0, enemyState.z);
+                enemies.Add(enemyState.id, enemyScript);
+            }
+            else
+            {
+                var clientEnemy = enemies[enemyState.id];
+                if (clientEnemy.state.health != enemyState.health)
+                {
+                    clientEnemy.TakeDamage(new Vector3(enemyState.xH, enemyState.yH, enemyState.zH), enemyState.health);
+                }
+
+                clientEnemy.state = enemyState;
+            }
+        }
+    }
+
+    private void UpdateStates()
+    {
+        var interpolatedSnapshot = _interpolation.Interpolate();
+        if (interpolatedSnapshot == null) return;
+
+        UpdatePlayers(interpolatedSnapshot);
+        UpdateEnemies(interpolatedSnapshot);
     }
 }

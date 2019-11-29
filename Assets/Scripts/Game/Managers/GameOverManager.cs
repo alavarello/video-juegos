@@ -6,7 +6,6 @@ public class GameOverManager : MonoBehaviour
     public static Client client;
     
     Animator anim;                          // Reference to the animator component.
-    float restartTimer;                     // Timer to count up to restarting the level
 
 
     void Awake ()
@@ -23,9 +22,9 @@ public class GameOverManager : MonoBehaviour
             if (!player.isDead) return;
         }
 
+        if (client.players.Count == 0) return;
  
         // ... tell the animator the game is over.
         anim.SetTrigger ("GameOver");
-
     }
 }

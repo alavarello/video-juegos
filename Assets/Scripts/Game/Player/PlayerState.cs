@@ -58,11 +58,8 @@ public class PlayerState
 
     public bool IsInTheSamePosition(PlayerState other)
     {   
-        if (Math.Abs(other.x - x) > 0.1 || Math.Abs(other.z - z) > 0.1)
-        {
-//            Debug.Log("Client: " + x + " " + z + " " + sequence + " Snapshot: " + other.x + " " + other.z + " " + sequence);
-            return false;
-        }
+        if (Math.Abs(other.x - x) > 0.5 || Math.Abs(other.z - z) > 0.5) return false;
+        
         return true;
     }
     
@@ -96,20 +93,20 @@ public class PlayerState
         sequence = bitBuffer.GetInt(0, 10000);
     }
     
-    public void serialize(BitBuffer bitBuffer)
+    public void Serialize(BitBuffer bitBuffer)
     {
-        bitBuffer.PutInt(id, 0, 10);
+        bitBuffer.InsertInt(id, 0, 10);
        
         bitBuffer.PutFloat(x, -100, 100, (float)0.1);
         bitBuffer.PutFloat(z, -100, 100, (float)0.1);
 
-        bitBuffer.PutInt((int) xA, 0, 360);
-        bitBuffer.PutInt((int) yA, 0, 360);
-        bitBuffer.PutInt((int) zA, 0, 360);
+        bitBuffer.InsertInt((int) xA, 0, 360);
+        bitBuffer.InsertInt((int) yA, 0, 360);
+        bitBuffer.InsertInt((int) zA, 0, 360);
         
-        bitBuffer.PutInt(health, 0, 100);
-        bitBuffer.PutBit(isShooting);
+        bitBuffer.InsertInt(health, 0, 100);
+        bitBuffer.InsertBit(isShooting);
         
-        bitBuffer.PutInt(sequence, 0, 10000);
+        bitBuffer.InsertInt(sequence, 0, 10000);
     }
 }

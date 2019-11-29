@@ -47,15 +47,23 @@ public class Prediction
         inputs.Enqueue(new PredictionVariables(h, v, yA, sequence));
     }
 
-    public void RebuildSequence(PlayerState playerState)
+    public Vector3 RebuildSequence(PlayerState playerState)
     {
         _states.Clear();
+        Vector3 movment = Vector3.zero;
         foreach (var input in inputs)
         {
-            var movment = new Vector3(input.h, 0, input.v);
+            movment = new Vector3(input.h, 0, input.v);
             movment = movment.normalized * 0.2f;
-            _states.Enqueue(new PlayerState(playerState.x + movment.x, 0, playerState.z + movment.z, 0, playerState.y, 0, 0, false));
         }
+        
+        var playerPosition = new Vector3(playerState.x, playerState.y, playerState.z);
+        if (movment == Vector3.zero) return playerPosition;
+        
+        _states.Enqueue(new PlayerState(playerState.x + movment.x, 0, playerState.z + movment.z, 
+            0, playerState.y, 0, 0, false, playerState.sequence));
+        return playerPosition + movment;
+
 
     }
 
@@ -97,8 +105,7 @@ public class Prediction
         if (!playerState.IsInTheSamePosition(snapshotState))
         {
             // Fix the player position (It will be updated later)
-            _player.transform.position = new Vector3(snapshotState.x, 0 , snapshotState.z);
-            RebuildSequence(snapshotState);
+            _player.transform.position = RebuildSequence(snapshotState);
 
         }
         if (!playerState.IsInTheSameRotation(snapshotState))

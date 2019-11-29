@@ -8,9 +8,7 @@ public class Engine: MonoBehaviour
     public int serverListeningPort;
     
     public int clientListeningPort;
-
-    public List<string> IPs = new List<string>();
-
+    
     public string serverIp;
     
     public bool isServer;
@@ -37,6 +35,8 @@ public class Engine: MonoBehaviour
 
         if(isClient)
         {
+            EnemyMovement.engine = this;
+            EnemyAttack.engine = this;
             ClientPlayer.playerId = playerId;
             client = new Client(this, FindObjectOfType<ClientPlayer>());
             ClientPlayer.client = client;

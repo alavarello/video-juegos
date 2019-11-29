@@ -193,7 +193,7 @@ Light:
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 2.634e-42, y: 1.02e-43, z: 0, w: 0}
+  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 4e-45}
   m_UseBoundingSphereOverride: 0
   m_ShadowRadius: 0
   m_ShadowAngle: 0
@@ -775,15 +775,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   serverListeningPort: 9090
   clientListeningPort: 9091
-  IPs:
-  - 10.17.32.179
-  - 127.0.0.1
-  serverIp: 127.0.0.1
-  isServer: 1
+  IPs: []
+  serverIp: 192.168.38.1
+  isServer: 0
   isClient: 1
-  playerId: 1
+  playerId: 0
   serverSps: 10
-  clientFps: 60
 --- !u!4 &1058797112
 Transform:
   m_ObjectHideFlags: 0

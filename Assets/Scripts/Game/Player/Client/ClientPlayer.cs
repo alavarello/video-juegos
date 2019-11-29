@@ -94,8 +94,6 @@ public class ClientPlayer : MonoBehaviour
         _playerRigidBody.MoveRotation(Quaternion.Euler(state.xA, state.yA, state.zA));
         // Animate the player.
         Animating();
-
-
     }
 
     public void Animating()
@@ -160,7 +158,10 @@ public class ClientPlayer : MonoBehaviour
             rotation.x, rotation.y, rotation.z,
             currentHealth, _playerShootingClient.isShooting
         );
-        // The shooting only is for one snapshot
+    }
 
+    public void RestartLevel()
+    {
+        
     }
 }
